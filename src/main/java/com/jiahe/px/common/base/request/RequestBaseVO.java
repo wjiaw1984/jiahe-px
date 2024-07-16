@@ -1,6 +1,6 @@
 package com.jiahe.px.common.base.request;
 
-import com.alibaba.fastjson.annotation.JSONField;
+import com.alibaba.fastjson2.annotation.JSONField;
 import lombok.Data;
 
 import java.io.Serializable;
