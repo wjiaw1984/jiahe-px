@@ -10,7 +10,7 @@ public class BaseVO<T> implements Serializable {
      * 返回编码
      *
      */
-    String returncode;
+    String code;
     /**
      * 返回数据
      */
@@ -19,19 +19,19 @@ public class BaseVO<T> implements Serializable {
     public static BaseVO<String> buildErrorResponse(String code,String errMsg){
         BaseVO<String> result = new BaseVO<String>();
         result.setData(errMsg);
-        result.setReturncode(code);
+        result.setCode(code);
         return result;
     }
 
     public static BaseVO buildErrorResponse(String code,Object entity){
         BaseVO result = new BaseVO(entity);
-        result.setReturncode(code);
+        result.setCode(code);
         return result;
     }
 
     public static BaseVO buildSuccess(Object entity){
         BaseVO result = new BaseVO(entity);
-        result.setReturncode("0");
+        result.setCode("0");
         return result;
     }
 
