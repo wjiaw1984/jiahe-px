@@ -8,12 +8,12 @@ import java.io.Serializable;
 
 @Data
 @Slf4j
-public class BaseResponse implements Serializable {
+public class BaseResponse<T> implements Serializable {
     public static String SUCCSS_MSG = "成功";
     public static String FAIL_MSG = "失败";
 
     private String code;
-    private Object data;
+    private T data;
     private String msg;
 
     public static BaseResponse buildSuccess(Object obj)

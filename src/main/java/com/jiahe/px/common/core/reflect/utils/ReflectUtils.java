@@ -2,6 +2,8 @@ package com.jiahe.px.common.core.reflect.utils;
 
 
 import com.alibaba.fastjson2.JSON;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Field;
@@ -13,6 +15,7 @@ import java.util.Set;
 /**
  * TODO 反射类工具
  */
+@Slf4j
 public class ReflectUtils {
 
     public static final boolean isJavaBean(Class<?> type){
@@ -21,11 +24,11 @@ public class ReflectUtils {
 
         // 根据 getDeserializer 返回值类型判断是否为 java bean 类型
         try {
-            PropertyDescriptor pd = new PropertyDescriptor(type.getSimpleName(), type);
+            return !BeanUtils.isSimpleProperty(type);
         } catch (Exception e){
+            log.error(e.getMessage());
             return false;
         }
-        return true;
     }
 
     public static final Class getClass(Object obj){

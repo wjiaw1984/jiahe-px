@@ -17,10 +17,10 @@ public class MD5 {
      * @return 密文
      * @throws Exception
      */
-    public static String md5(String text){
+    public static String md5(String text, String charsetName){
         byte[] hash;
         try {
-            hash = MessageDigest.getInstance("MD5").digest(text.getBytes("UTF-8"));
+            hash = MessageDigest.getInstance("MD5").digest(text.getBytes(charsetName));
         } catch (UnsupportedEncodingException e) {
             throw new RuntimeException("UTF-8 is unsupported", e);
         } catch (NoSuchAlgorithmException e) {
@@ -48,8 +48,8 @@ public class MD5 {
         paramValues.append(data);
         paramValues.append(appSecret);
         log.info("待加密:" + paramValues.toString());
-        log.info("生成sign:" + md5(paramValues.toString()));
-        return md5(paramValues.toString());
+        log.info("生成sign:" + md5(paramValues.toString(),"utf-8"));
+        return md5(paramValues.toString(),"utf-8");
     }
 
     /**
