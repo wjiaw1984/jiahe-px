@@ -46,7 +46,7 @@ public class PxController extends BaseRestController {
                 baseResponse = (BaseResponse)result;
             } else if(result.getClass() == BaseVO.class){
                 baseResponse = new BaseResponse();
-                baseResponse.setCode(((BaseVO) result).getReturncode());
+                baseResponse.setCode(((BaseVO) result).getCode());
                 baseResponse.setData(((BaseVO) result).getData());
             }
             else {
