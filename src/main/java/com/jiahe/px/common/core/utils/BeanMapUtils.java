@@ -1,15 +1,12 @@
 package com.jiahe.px.common.core.utils;
 
-import com.alibaba.fastjson.util.TypeUtils;
-import com.efuture.myshop.core.bean.EasyBeanWrapper;
+import com.alibaba.fastjson2.util.TypeUtils;
+import com.jiahe.px.common.core.bean.EasyBeanWrapper;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-/**
- * Created by wzm on 2019/2/15.
- */
 public class BeanMapUtils {
     /**
      * map转为bean. map中的key和bean中的字段 大小写可以不一致

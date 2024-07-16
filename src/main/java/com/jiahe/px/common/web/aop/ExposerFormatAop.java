@@ -16,7 +16,7 @@ import org.springframework.stereotype.Component;
 @Component
 @Order(0)
 public class ExposerFormatAop {
-    @Pointcut("@annotation(com.efuture.myshop.common.web.annotation.ExposerFormat)")
+    @Pointcut("@annotation(com.jiahe.px.common.web.annotation.ExposerFormat)")
     public void exposerFormatHandle(){}
 
     @Before("exposerFormatHandle()")

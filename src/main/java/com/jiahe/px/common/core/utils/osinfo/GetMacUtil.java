@@ -1,6 +1,6 @@
 package com.jiahe.px.common.core.utils.osinfo;
 
-import com.efuture.myshop.core.utils.Convert;
+import com.jiahe.px.common.core.utils.Convert;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.BufferedReader;
@@ -11,10 +11,6 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Created by dengyongdong on 2017/6/8.
- * modify by wujiawen on 2019/11/12
- */
 @Slf4j
 public class GetMacUtil {
     public static void main(String[] args) {

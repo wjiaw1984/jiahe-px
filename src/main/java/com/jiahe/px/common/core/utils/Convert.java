@@ -1,8 +1,8 @@
 package com.jiahe.px.common.core.utils;
 
 
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson2.JSONArray;
+import com.alibaba.fastjson2.JSONObject;
 import org.springframework.util.StringUtils;
 
 import javax.sql.rowset.serial.SerialBlob;
@@ -2012,7 +2012,7 @@ public class Convert {
             return false;
         }
         try {
-            JSONArray.parseObject(content);
+            JSONArray.parseArray(content);
         } catch (Exception e) {
             return false;
         }

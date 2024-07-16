@@ -1,6 +1,6 @@
 package com.jiahe.px.common.core.utils.Retrofit2;
 
-import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson2.JSON;
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
 import retrofit2.Converter;

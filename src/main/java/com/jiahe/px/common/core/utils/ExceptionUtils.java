@@ -1,10 +1,8 @@
 package com.jiahe.px.common.core.utils;
 
-import com.efuture.myshop.common.base.BaseException;
 
-/**
- * Created by wzm on 2018/8/24.
- */
+import com.jiahe.px.common.base.BaseException;
+
 public class ExceptionUtils {
 
     public static void raise(String code, String message){

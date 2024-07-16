@@ -1,14 +1,10 @@
 package com.jiahe.px.common.core.utils.osinfo;
 
-import com.efuture.myshop.constant.PathConstant;
+import com.jiahe.px.common.constant.PathConstant;
 import lombok.extern.slf4j.Slf4j;
 
 import java.nio.file.Paths;
 
-/**
- * Created by wujiawen on 2019/11/12
- * 获取项目相关路径
- */
 @Slf4j
 public class GetPathUtil {
     public static void getProjectBasePath(){
