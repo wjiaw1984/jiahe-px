@@ -9,7 +9,7 @@ create table dbo.px_goods_price
   lastUpdateTime	datetime default getdate() not null,            --最后更新日期
   goodsid			int,											--erp商品编码
   customNo			varchar(32),									--批销系统客户编码
-  price				varchar(32),									--批销商品单价
+  price				dec(10,3),									    --批销商品单价
   inventory			varchar(32),									--批销库存
   goodsCode			varchar(32),									--批销商品编码
   barCode			varchar(32),									--批销商品条码
@@ -20,6 +20,7 @@ create table dbo.px_goods_price
 
 
 go
+
 
 create index i1_px_goods_price on px_goods_price(goodsid);
 create index i2_px_goods_price on px_goods_price(goodsCode,barCode);

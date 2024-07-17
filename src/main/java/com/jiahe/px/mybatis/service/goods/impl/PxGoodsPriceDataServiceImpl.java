@@ -2,6 +2,7 @@ package com.jiahe.px.mybatis.service.goods.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.jiahe.px.common.base.BaseException;
 import com.jiahe.px.common.core.utils.Convert;
 import com.jiahe.px.model.goods.PxGoodsItem;
 import com.jiahe.px.model.goods.PxGoodsPriceDo;
@@ -24,11 +25,11 @@ import java.util.List;
 public class PxGoodsPriceDataServiceImpl extends ServiceImpl<IPxGoodsPriceMapper, PxGoodsPriceDo> implements IPxGoodsPriceDataService {
     @Override
     public void updateGoodsPrice(PxGoodsItem entity) {
-        PxGoodsPriceDo pxGoodsPriceDo =updateByPxGoodsItem(entity);
-        if (pxGoodsPriceDo != null){
-            if (pxGoodsPriceDo.getId() == null){
+        PxGoodsPriceDo pxGoodsPriceDo = updateByPxGoodsItem(entity);
+        if (pxGoodsPriceDo != null) {
+            if (pxGoodsPriceDo.getId() == null) {
                 save(pxGoodsPriceDo);
-            }else {
+            } else {
                 pxGoodsPriceDo.setLastUpdateTime(new Date());
                 updateById(pxGoodsPriceDo);
             }
@@ -36,43 +37,71 @@ public class PxGoodsPriceDataServiceImpl extends ServiceImpl<IPxGoodsPriceMapper
     }
 
     public PxGoodsPriceDo updateByPxGoodsItem(PxGoodsItem entity) {
-        PxGoodsPriceDo pxGoodsPriceDo = getByGoodsCode(entity.getGoodsCode());
+        PxGoodsPriceDo pxGoodsPriceDo = getByBarCode(entity.getBarCode());
         if (pxGoodsPriceDo == null) {
-            pxGoodsPriceDo = new PxGoodsPriceDo();
-            if (!StringUtils.isEmpty(entity.getBarCode())) {
-                pxGoodsPriceDo.setBarCode(entity.getBarCode());
-            }
-            if (!StringUtils.isEmpty(entity.getGoodsCode())) {
-                pxGoodsPriceDo.setGoodsCode(entity.getGoodsCode());
-            }
-            if (!StringUtils.isEmpty(entity.getInventory())) {
-                pxGoodsPriceDo.setInventory(Convert.ToDecimal(entity.getInventory()));
-            }
-            if (!StringUtils.isEmpty(entity.getPrice())) {
-                pxGoodsPriceDo.setPrice(Convert.ToDecimal(entity.getPrice()));
-            }
+            try {
+                pxGoodsPriceDo = new PxGoodsPriceDo();
+                if (!StringUtils.isEmpty(entity.getBarCode())) {
+                    pxGoodsPriceDo.setBarCode(entity.getBarCode());
+                }
+                if (!StringUtils.isEmpty(entity.getGoodsCode())) {
+                    pxGoodsPriceDo.setGoodsCode(entity.getGoodsCode());
+                }
+                if (!StringUtils.isEmpty(entity.getInventory())) {
+                    pxGoodsPriceDo.setInventory(entity.getInventory());
+                }
+                if (!StringUtils.isEmpty(entity.getPrice())) {
+                    pxGoodsPriceDo.setPrice(Convert.ToDecimal(entity.getPrice()));
+                }
 
-            pxGoodsPriceDo.setIsDirect(entity.getIsDirect());
-            pxGoodsPriceDo.setMatnr(entity.getMatnr());
-        } else {
-            if (!pxGoodsPriceDo.getBarCode().equals(entity.getBarCode())) {
-                pxGoodsPriceDo.setBarCode(entity.getBarCode());
-            }
-
-            if (pxGoodsPriceDo.getInventory().compareTo(Convert.ToDecimal(entity.getBarCode())) != 0) {
-                pxGoodsPriceDo.setInventory(Convert.ToDecimal(entity.getInventory()));
-            }
-
-            if (pxGoodsPriceDo.getPrice().compareTo(Convert.ToDecimal(entity.getPrice())) != 0) {
-                pxGoodsPriceDo.setPrice(Convert.ToDecimal(entity.getPrice()));
-            }
-
-            if (!pxGoodsPriceDo.getIsDirect().equals(entity.getIsDirect())) {
                 pxGoodsPriceDo.setIsDirect(entity.getIsDirect());
-            }
-
-            if (!pxGoodsPriceDo.getMatnr().equals(entity.getMatnr())) {
                 pxGoodsPriceDo.setMatnr(entity.getMatnr());
+            } catch (Exception e) {
+                String errMsg = String.format("updateByPxGoodsItem {%s} error:{%s}", "生成数据表[px_goods_price]", e.getMessage());
+                log.error(errMsg);
+                throw new BaseException(errMsg);
+            }
+        } else {
+            try {
+                if (!pxGoodsPriceDo.getBarCode().equals(entity.getBarCode())) {
+                    pxGoodsPriceDo.setBarCode(entity.getBarCode());
+                }
+
+                if ((StringUtils.isEmpty(pxGoodsPriceDo.getInventory()) && !StringUtils.isEmpty(entity.getInventory()))
+                        || (!StringUtils.isEmpty(pxGoodsPriceDo.getInventory()) && StringUtils.isEmpty(entity.getInventory()))
+                        || (!StringUtils.isEmpty(pxGoodsPriceDo.getInventory()) && !StringUtils.isEmpty(entity.getInventory()))) {
+                    if (!pxGoodsPriceDo.getInventory().equals(entity.getInventory())) {
+                        pxGoodsPriceDo.setInventory(entity.getInventory());
+                    }
+                }
+
+                if ((pxGoodsPriceDo.getPrice() == null && !StringUtils.isEmpty(entity.getPrice()))
+                        || (pxGoodsPriceDo.getPrice() != null && !StringUtils.isEmpty(entity.getPrice()))
+                        || (pxGoodsPriceDo.getPrice() != null && StringUtils.isEmpty(entity.getPrice()))) {
+                    if (pxGoodsPriceDo.getPrice().compareTo(Convert.ToDecimal(entity.getPrice())) != 0) {
+                        pxGoodsPriceDo.setPrice(Convert.ToDecimal(entity.getPrice()));
+                    }
+                }
+
+                if ((StringUtils.isEmpty(pxGoodsPriceDo.getIsDirect()) && !StringUtils.isEmpty(entity.getIsDirect()))
+                        || (!StringUtils.isEmpty(pxGoodsPriceDo.getIsDirect()) && StringUtils.isEmpty(entity.getIsDirect()))
+                        || (!StringUtils.isEmpty(pxGoodsPriceDo.getIsDirect()) && !StringUtils.isEmpty(entity.getIsDirect()))) {
+                    if (!pxGoodsPriceDo.getIsDirect().equals(entity.getIsDirect())) {
+                        pxGoodsPriceDo.setIsDirect(entity.getIsDirect());
+                    }
+                }
+
+                if ((StringUtils.isEmpty(pxGoodsPriceDo.getMatnr()) && !StringUtils.isEmpty(entity.getMatnr()))
+                        || (!StringUtils.isEmpty(pxGoodsPriceDo.getMatnr()) && StringUtils.isEmpty(entity.getMatnr()))
+                        || (!StringUtils.isEmpty(pxGoodsPriceDo.getMatnr()) && !StringUtils.isEmpty(entity.getMatnr()))) {
+                    if (!pxGoodsPriceDo.getMatnr().equals(entity.getMatnr())) {
+                        pxGoodsPriceDo.setMatnr(entity.getMatnr());
+                    }
+                }
+            } catch (Exception e) {
+                String errMsg = String.format("updateByPxGoodsItem {%s} error:{%s}", "更新数据表[px_goods_price]", e.getMessage());
+                log.error(errMsg);
+                throw new BaseException(errMsg);
             }
         }
         return pxGoodsPriceDo;
@@ -80,19 +109,19 @@ public class PxGoodsPriceDataServiceImpl extends ServiceImpl<IPxGoodsPriceMapper
 
 
     @Override
-    public PxGoodsPriceDo getByGoodsCode(String goodsCode) {
+    public PxGoodsPriceDo getByBarCode(String barCode) {
         QueryWrapper<PxGoodsPriceDo> qw = new QueryWrapper<>();
-        qw.eq("goodsCode", goodsCode);
+        qw.eq("barCode", barCode);
         return getOne(qw, false);
     }
 
     @Override
     public Integer batchSaveOrUpdate(List<PxGoodsItem> list) {
         Integer result = 0;
-        if (!CollectionUtils.isEmpty(list)){
-            for (PxGoodsItem entity : list){
+        if (!CollectionUtils.isEmpty(list)) {
+            for (PxGoodsItem entity : list) {
                 updateGoodsPrice(entity);
-                result ++;
+                result++;
             }
         }
         return result;

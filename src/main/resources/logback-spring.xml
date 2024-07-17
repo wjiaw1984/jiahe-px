@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration debug="false" scan="true" scanPeriod="1 seconds">
-    <property name="contextname" value="myshop-controller"/>
+    <property name="contextname" value="jiahe-px-controller"/>
     <contextName>${contextname}</contextName>
     <springProperty scope="context" name="logPath" source="log.path" defaultValue="./logs/${contextname}"/>
     <springProperty scope="context" name="logServer" source="log.server" defaultValue="127.0.0.1:5068"/>
@@ -115,9 +115,8 @@
         </filter>
     </appender>
 
+    <logger name="com.jiahe.px.mybatis.dao" level="debug"/>
     <root  level="info">
-    <!--<root name="com.efuture.myshop.bsretail.service" level="DEBUG">-->
-    <!--<root level="info">-->
         <appender-ref ref="console"/>
         <appender-ref ref="warn"/>
         <appender-ref ref="error"/>

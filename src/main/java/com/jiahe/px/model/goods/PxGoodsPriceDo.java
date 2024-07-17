@@ -23,7 +23,7 @@ public class PxGoodsPriceDo implements Serializable {
     private int goodsId;
     private String customNo;
     private BigDecimal price;
-    private BigDecimal inventory;
+    private String inventory;
     private String goodsCode;
     private String barCode;
     private String matnr;

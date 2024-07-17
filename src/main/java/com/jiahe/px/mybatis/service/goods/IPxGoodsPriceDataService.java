@@ -20,7 +20,7 @@ public interface IPxGoodsPriceDataService extends IService<PxGoodsPriceDo> {
      **/
     void updateGoodsPrice(PxGoodsItem entity);
 
-    PxGoodsPriceDo getByGoodsCode(String goodsCode);
+    PxGoodsPriceDo getByBarCode(String BarCode);
 
     Integer batchSaveOrUpdate(List<PxGoodsItem> list);
 

@@ -12,7 +12,23 @@ spring:
         content:
           enabled: true
           paths: /**
+  datasource:
+    username: sa
+    password: myshopr5
+    url: jdbc:sqlserver://172.16.120.1:1077;DatabaseName=test
+    driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
 
+
+mybatis-plus:
+  mapper-locations: classpath*:/mapper/**/*.xml
+  configuration:
+    log-impl: org.apache.ibatis.logging.slf4j.Slf4jImpl
+    #log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+    #sql执行超时时间,单位秒
+    default-statement-timeout: 25
+    #驼峰命名
+    map-underscore-to-camel-case: false
+  type-aliases-package: com.jiahe.px.mybatis.dao
 
 server:
   #当前服务端口号
