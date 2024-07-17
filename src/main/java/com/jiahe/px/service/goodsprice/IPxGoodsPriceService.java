@@ -10,4 +10,6 @@ import com.jiahe.px.model.goods.ResPxGoodsPriceVo;
  */
 public interface IPxGoodsPriceService {
     BaseResponse<ResPxGoodsPriceVo> goodsPriceQuery(ReqPxGoodsPriceVo entity);
+
+    void syncGoodsPrice();
 }

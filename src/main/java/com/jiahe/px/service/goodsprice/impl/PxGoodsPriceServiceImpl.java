@@ -2,6 +2,7 @@ package com.jiahe.px.service.goodsprice.impl;
 
 import com.jiahe.px.common.web.support.BaseResponse;
 import com.jiahe.px.model.goods.PxGoodsItem;
+import com.jiahe.px.model.goods.PxGoodsPriceDo;
 import com.jiahe.px.model.goods.ReqPxGoodsPriceVo;
 import com.jiahe.px.model.goods.ResPxGoodsPriceVo;
 import com.jiahe.px.mybatis.service.goods.IPxGoodsPriceDataService;
@@ -27,13 +28,27 @@ public class PxGoodsPriceServiceImpl implements IPxGoodsPriceService {
     @Override
     public BaseResponse<ResPxGoodsPriceVo> goodsPriceQuery(ReqPxGoodsPriceVo entity) {
         BaseResponse<ResPxGoodsPriceVo> result = httpBaseCallService.goodsPriceQuery(entity);
-        if ("0".equals(result.getCode())){
-            log.info("调用商品价格查询接口成功");
-            if (!CollectionUtils.isEmpty(result.getData().getGoods())){
-                pxGoodsPriceDataService.batchSaveOrUpdate(result.getData().getGoods());
-                log.info("商品价格查询接口返回数据入库成功");
-            }
-        }
         return result;
+    }
+
+    public ResPxGoodsPriceVo listPxGoodsPrice(ReqPxGoodsPriceVo entity) {
+        ResPxGoodsPriceVo result = httpBaseCallService.goodsPriceQuery(entity).getData();
+        return result;
+    }
+
+    @Override
+    public void syncGoodsPrice() {
+        ResPxGoodsPriceVo resPxGoodsPriceList;
+        Integer pageNo = 0;
+        do{
+            pageNo = pageNo + 1;
+            ReqPxGoodsPriceVo params = new ReqPxGoodsPriceVo();
+            params.setCurPageNo(pageNo);
+            resPxGoodsPriceList = listPxGoodsPrice(params);
+            if (!CollectionUtils.isEmpty(resPxGoodsPriceList.getGoods())){
+                pxGoodsPriceDataService.batchSaveOrUpdate(resPxGoodsPriceList.getGoods());
+                log.info("商品价格查询页["+params.getCurPageNo()+"]接口返回数据入库成功");
+            }
+        }while  (resPxGoodsPriceList.getTotalPage()>pageNo);
     }
 }
