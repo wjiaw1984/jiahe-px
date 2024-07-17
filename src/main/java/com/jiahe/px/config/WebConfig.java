@@ -25,12 +25,17 @@ public class WebConfig extends WebMvcConfigurationSupport {
         //1.自定义配置...
 
         FastJsonConfig config = new FastJsonConfig();
-        config.setDateFormat("yyyy-MM-dd HH:mm:ss");
+        config.setDateFormat("yyyy-MM-dd");
         //2.1配置序列化的行为
         //JSONWriter.Feature.PrettyFormat:格式化输出
-        config.setWriterFeatures(JSONWriter.Feature.PrettyFormat);
+        config.setWriterFeatures(JSONWriter.Feature.PrettyFormat/*,
+                JSONWriter.Feature.WriteMapNullValue,
+                JSONWriter.Feature.WriteNullListAsEmpty*/);
         //2.2配置反序列化的行为
-        config.setReaderFeatures(JSONReader.Feature.FieldBased, JSONReader.Feature.SupportArrayToBean);
+        config.setReaderFeatures(JSONReader.Feature.FieldBased,
+                JSONReader.Feature.SupportArrayToBean,
+                JSONReader.Feature.EmptyStringAsNull
+        );
         return config;
     }
 

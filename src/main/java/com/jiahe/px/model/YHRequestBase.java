@@ -31,7 +31,7 @@ public class YHRequestBase implements Serializable {
         result.put("appId", this.appId);
         result.put("version", this.version);
         result.put("signType", this.signType);
-        result.put("sign", this.sign);
+        //result.put("sign", this.sign);
         result.put("reqTime", this.reqTime);
         result.put("customNo", this.customNo);
         return result;

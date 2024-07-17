@@ -4,6 +4,7 @@ import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.jiahe.px.model.YHRequestBase;
 import lombok.Data;
+import org.springframework.util.CollectionUtils;
 
 import java.security.Principal;
 import java.util.List;
@@ -22,7 +23,7 @@ public class ReqPxGoodsPriceVo extends YHRequestBase {
     public JSONObject toJSON() {
         JSONObject json = super.toJSON();
         json.put("curPageNo", curPageNo);
-        if (goods != null) {
+        if (!CollectionUtils.isEmpty(goods)) {
             json.put("goods", JSONArray.toJSONString(goods));
         }
         return json;

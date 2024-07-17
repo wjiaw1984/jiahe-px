@@ -8,6 +8,10 @@ import com.jiahe.px.config.AppConfig;
 import com.jiahe.px.model.YHRequestBase;
 import com.jiahe.px.model.goods.ReqPxGoodsPriceVo;
 import com.jiahe.px.model.goods.ResPxGoodsPriceVo;
+import com.jiahe.px.model.order.ReqOrderSaveVo;
+import com.jiahe.px.model.order.ReqQueryOrderVo;
+import com.jiahe.px.model.order.ReqReceiveVo;
+import com.jiahe.px.model.order.ResQueryOrderVo;
 import com.jiahe.px.send.HttpInstance;
 import com.jiahe.px.send.IHttpBaseCallService;
 import lombok.extern.slf4j.Slf4j;
@@ -89,7 +93,27 @@ public class HttpBaseCallServiceImpl implements IHttpBaseCallService {
 
         } catch (Exception ex) {
             log.error("线程【" + th.getId() + "】调用远程服务【" + getFuncName + "】异常：" + ex.getMessage());
-            throw new RuntimeException("远程服务异常！");
+            throw new RuntimeException(String.format("远程服务异常: %s",ex.getMessage()));
         }
+    }
+
+    @Override
+    public BaseResponse orderSave(ReqOrderSaveVo entity) {
+        BaseResponse result = call("orderSave", entity);
+        return result;
+    }
+
+    @Override
+    public BaseResponse<ResQueryOrderVo> queryOrder(ReqQueryOrderVo entity) {
+        BaseResponse<ResQueryOrderVo> result = call("queryOrder", entity);
+        JSONObject jsonObject = JSONObject.from(result.getData()) ;
+        result.setData(jsonObject.toJavaObject(ResQueryOrderVo.class));
+        return result;
+    }
+
+    @Override
+    public BaseResponse receive(ReqReceiveVo entity) {
+        BaseResponse result = call("receive", entity);
+        return result;
     }
 }
