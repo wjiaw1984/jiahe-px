@@ -17,6 +17,5 @@ public class PxGoodsItem implements Serializable {
     private String goodsCode;
     private String barCode;
     private String matnr;
-    private String maktx;
     private String isDirect;
 }
