@@ -16,4 +16,8 @@ public interface IPxOrderService {
     BaseResponse orderSave(ReqOrderSaveVo entity);
 
     BaseResponse receive(ReqReceiveVo entity);
+
+    void sendOrder();
+
+    void syncOrder();
 }

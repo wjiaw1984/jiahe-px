@@ -1,5 +1,6 @@
 package com.jiahe.px.model.order;
 
+import com.alibaba.fastjson2.JSONObject;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -44,5 +45,9 @@ public class OrderItemsDo implements Serializable {
                 ", deliveryStatus='" + deliveryStatus + '\'' +
                 ", deliveryDate=" + deliveryDate +
                 '}';
+    }
+
+    public OrderItem toOrderItem(){
+        return JSONObject.from(this).toJavaObject(OrderItem.class);
     }
 }

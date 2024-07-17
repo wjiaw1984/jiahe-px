@@ -1,5 +1,6 @@
 package com.jiahe.px.model.order;
 
+import com.alibaba.fastjson2.JSONObject;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
@@ -27,6 +28,7 @@ public class OrderDo implements Serializable {
     private Date orderDate;
     private Date deliveryDate;
     private String orderTitle;
+    //0未交货 1部分交货 2全部交货 -1待推送
     private String deliveryStatus;
 
     @Override
@@ -48,5 +50,13 @@ public class OrderDo implements Serializable {
                 ", orderTitle='" + orderTitle + '\'' +
                 ", deliveryStatus='" + deliveryStatus + '\'' +
                 '}';
+    }
+
+    public Order toOrder(){
+        return JSONObject.from(this).toJavaObject(Order.class);
+    }
+
+    public ReqOrderSaveVo toReqOrderSaveVo(){
+        return JSONObject.from(this).toJavaObject(ReqOrderSaveVo.class);
     }
 }
