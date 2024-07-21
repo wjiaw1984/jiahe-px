@@ -2,10 +2,7 @@ package com.jiahe.px.mybatis.service.order.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.jiahe.px.model.order.OrderDo;
-import com.jiahe.px.model.order.OrderItem;
-import com.jiahe.px.model.order.OrderItemsDo;
-import com.jiahe.px.model.order.ReqOrderSaveVo;
+import com.jiahe.px.model.order.*;
 import com.jiahe.px.mybatis.dao.order.IOrderMapper;
 import com.jiahe.px.mybatis.service.order.IOrderDataService;
 import com.jiahe.px.mybatis.service.order.IOrderItemsDataService;
@@ -61,9 +58,9 @@ public class OrderDataServiceImpl extends ServiceImpl<IOrderMapper, OrderDo> imp
     }
 
     @Override
-    public List<OrderDo> listByDeliveryStatus(String deliveryStatus) {
+    public List<OrderDo> listByDeliveryStatus(List<String> deliveryStatus) {
         QueryWrapper<OrderDo> qw = new QueryWrapper<>();
-        qw.eq("deliveryStatus", deliveryStatus);
+        qw.in("deliveryStatus", deliveryStatus);
         return list(qw);
     }
 
@@ -78,8 +75,9 @@ public class OrderDataServiceImpl extends ServiceImpl<IOrderMapper, OrderDo> imp
         return result;
     }
 
+
     @Override
-    public List<ReqOrderSaveVo> listReqOrderSaveByDeliveryStatus(String deliveryStatus) {
+    public List<ReqOrderSaveVo> listReqOrderSaveByDeliveryStatus(List<String> deliveryStatus) {
         try {
             List<ReqOrderSaveVo> result = toReqOrderSaveVo(listByDeliveryStatus(deliveryStatus));
             List<String> orderNos = result.stream().map(ReqOrderSaveVo::getOrderNo).collect(Collectors.toList());
@@ -102,6 +100,67 @@ public class OrderDataServiceImpl extends ServiceImpl<IOrderMapper, OrderDo> imp
         OrderDo orderDo = new OrderDo();
         orderDo.setDeliveryStatus(status);
         update(orderDo, qw);
+    }
+
+    @Override
+    public List<OrderDo> listByDeliveryStatus(String deliveryStatus) {
+        QueryWrapper<OrderDo> qw = new QueryWrapper<>();
+        qw.eq("deliveryStatus", deliveryStatus);
+        return list(qw);
+    }
+
+    @Override
+    public List<ReqReceiveVo> listReqReceiveByDeliveryStatus(String deliveryStatus) {
+        try {
+            List<ReqReceiveVo> result = toReqReceiveVo(listByDeliveryStatus(deliveryStatus));
+            List<String> orderNos = result.stream().map(ReqReceiveVo::getOrderNo).collect(Collectors.toList());
+            List<OrderItemsDo> orderItemsList = orderItemsDataService.listInOrderNo(orderNos);
+            for (ReqReceiveVo item : result) {
+                item.setReceiveItem(toReceiveItem(orderItemsList.stream().filter(orderItem -> orderItem.getOrderNo().equals(item.getOrderNo())).collect(Collectors.toList())));
+            }
+            return result;
+        }catch (Exception e){
+            String errMsg = String.format("listReqReceiveByDeliveryStatus error:{%s}",e.getMessage());
+            log.error(errMsg);
+            return null;
+        }
+    }
+
+    public List<ReqReceiveVo> toReqReceiveVo(List<OrderDo> orderList) {
+        List<ReqReceiveVo> result = new ArrayList<>();
+        if (!CollectionUtils.isEmpty(orderList)) {
+            for (OrderDo order : orderList) {
+                result.add(order.toReqReceiveVo());
+            }
+            log.info("转换成ReqReceiveVo对象成功");
+        }
+        return result;
+    }
+
+    public List<ReceiveItemVo> toReceiveItem(List<OrderItemsDo> orderItemsList) {
+        List<ReceiveItemVo> result = new ArrayList<>();
+        if (!CollectionUtils.isEmpty(orderItemsList)) {
+            for (OrderItemsDo item : orderItemsList) {
+                result.add(item.toReceiveItem());
+            }
+            log.info("转换成OrderItem对象成功");
+        }
+        return result;
+    }
+
+    @Override
+    public OrderDo getOrderByOrderNo(String orderNo) {
+        return getByOrderNo(orderNo);
+    }
+
+    @Override
+    public List<OrderItemsDo> listOrderItemsByOrderNo(String orderNo) {
+        return orderItemsDataService.listByOrderNo(orderNo);
+    }
+
+    @Override
+    public void updateOrderItems(List<OrderItemsDo> orderItemsDos) {
+        orderItemsDataService.updateBatchById(orderItemsDos);
     }
 }
 

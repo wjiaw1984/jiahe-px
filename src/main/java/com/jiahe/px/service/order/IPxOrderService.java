@@ -20,4 +20,7 @@ public interface IPxOrderService {
     void sendOrder();
 
     void syncOrder();
+
+    void sendReceipt();
+
 }

@@ -4,6 +4,7 @@ import com.alibaba.fastjson2.JSONObject;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.jiahe.px.common.core.utils.Convert;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -29,6 +30,10 @@ public class OrderItemsDo implements Serializable {
     private BigDecimal price;
     private String deliveryStatus;
     private Date deliveryDate;
+    //erp验收数量
+    private BigDecimal receiptQty;
+    //erp验收日期
+    private Date receiptDate;
 
     @Override
     public String toString() {
@@ -49,5 +54,11 @@ public class OrderItemsDo implements Serializable {
 
     public OrderItem toOrderItem(){
         return JSONObject.from(this).toJavaObject(OrderItem.class);
+    }
+    public ReceiveItemVo toReceiveItem(){
+        ReceiveItemVo result = JSONObject.from(this).toJavaObject(ReceiveItemVo.class);
+        result.setReceiveNum(Convert.ToString(receiptQty.setScale(2)));
+        result.setReceiveDate(Convert.dateFormat(receiptDate,"yyyy-MM-dd"));
+        return result;
     }
 }

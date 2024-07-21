@@ -51,7 +51,8 @@ create table dbo.px_order
   orderDate				DateTime,									--订单日期
   deliveryDate		DateTime,									--到店日期：计划发货日期，如果为空则取订单日期
   orderTitle			Varchar(255),							--订单备注
-  deliveryStatus  [varchar](4),							--订单状态  0未交货 1部分交货 2全部交货 -1待推送
+  deliveryStatus  [varchar](4),							--订单状态  0未交货 1部分交货 2全部交货 -1待推送 -2 验收后待推送
+  ReceiptSheetId    varchar(32),									--验收单号
   primary key(id)
 );
 
@@ -65,18 +66,21 @@ Go
 
 CREATE TABLE [dbo].[px_Order_Items](
 	[Id] 										[INT] PRIMARY KEY,
-	createTime		datetime default getdate() not null,			--创建日期
-    lastUpdateTime	datetime default getdate() not null,            --最后更新日期
-	[orderNo]								[varchar](32) not null,	--批销订单号
-	[GoodsCode] 						[NVARCHAR](32) NULL,		--商品编码
-	[BarCode] 							[NVARCHAR](32) NULL,		--商品条码
-	[Num] 									[dec](10,3) NULL,				--数量
+	createTime		datetime default getdate() not null,				--创建日期
+    lastUpdateTime	datetime default getdate() not null,				--最后更新日期
+	[orderNo]								[varchar](32) not null,		--批销订单号
+	[GoodsCode] 						[NVARCHAR](32) NULL,			--商品编码
+	[BarCode] 							[NVARCHAR](32) NULL,			--商品条码
+	[GoodsId]								[INT],						--商品编码(ERP)
+	[Num] 									[dec](10,3) NULL,			--数量
 	[Unit]									[NVARCHAR](32) NULL,		--单位
-	[deliveryNo]						[varchar](32) null,			--交货单号
-	[deliveryNum]						[varchar](32) null,			--交货数量
-	[price]									[dec](10,3) null,				--价格
-	[deliveryStatus]				[varchar](4) null,			--交货状态 0未交货 1部分交货 2全部交货
-	[deliveryDate]					[datetime] null					--交货日期
+	[deliveryNo]						[varchar](32) null,				--交货单号
+	[deliveryNum]						[varchar](32) null,				--交货数量
+	[price]									[dec](10,3) null,			--价格
+	[deliveryStatus]				[varchar](4) null,					--交货状态 0未交货 1部分交货 2全部交货
+	[deliveryDate]					[datetime] null,					--交货日期
+	[ReceiptQty]					[dec](10,3) default 0,				--验收数量
+	[ReceiptDate]					[datetime]							--验收日期
 );
 
 go
@@ -91,6 +95,7 @@ if not exists(select 1 from config () where name = 'PX批销供应商')
   values(22,'PX批销供应商','-1','-1 没有PX批销供应商');
   
 go
+
 
 IF exists(select 1 from sysobjects where id = OBJECT_ID('TL_SheetIn_SDWMS'))
   drop proc TL_SheetIn_SDWMS
@@ -230,6 +235,7 @@ AS BEGIN
   DECLARE @fyNewSheetID CHAR(16);
   DECLARE @basecost DEC(16,4);
   DECLARE @goodscostid INT;
+  declare @pxvenderid integer;
 
   SET NOCOUNT ON
   SET XACT_ABORT ON			--分布式事务必须
@@ -355,180 +361,7 @@ AS BEGIN
      BEGIN  
        select @Count=Count(*) from Receipt0 where SheetID=@ASheetID;
        --支持无订单收货模式....
-      /* IF @Count=0
-       BEGIN
-         select @count=0;
-         select @Count=count(*) from Receipt0 where refsheetid=@Sheetid;
-         select @Count=@Count+count(*) from Receipt where refsheetid=@Sheetid;
-
-         --单据已经上传,避免重复,做个检查控制...
-         if @Count>0
-         begin
-           select @Msg='WMS紧急验收单已经有验收单记录,不允许重复验收!'
-           goto ErrHandle;
-         END;         
-         execute @Err=TL_GetNewSheetID 2301,@NewSheetID output;
-         if @Err <> 0 or @Err is null begin
-         	select @Msg='验收单号产生失败!'
-              goto ErrHandle;
-         END;
-
-         --订货规格
-         select @OrderPKNumType=OrderPKNumType from ShopType where ShopTypeID = 21;
-         if Object_id('#GoodsPKNum') is not null drop table #GoodsPKNum;
-
-         create table #GoodsPKNum
-         (
-           GoodsID int not null,
-           PKNum int default 1 not null,		--订货数量
-           PKName char(8) default '件' not null,		--订货单位
-           PKSpec char(32) default '1*1' not null, 	--订货规格
-         );
-
-         create index i1_TMP_GoodsPKNum on #GoodsPKNum(GoodsID);
-
-         --最低级就是取主条码的件装数
-         insert into #GoodsPKNum
-         select DISTINCT a.GoodsID,1,'',''
-         From InterFaceWMSDB.dbo.FR_RECEIPT a where a.RefSheetID=@SheetID;
-
-         select @Err = @@error;
-         if @Err != 0 goto ErrHandle;
-
-         --下一级是取流转吗的件装数
-         update #GoodsPKNum
-         set    PKNum = b.PKNum,
-                PKName = b.PKName,
-                PKSpec = b.PKSpec
-         from   #GoodsPKNum a,Barcode b
-         where  a.GoodsID = b.GoodsID and b.Flag = 1
-
-         --最优先取的是GoodsPKNum有定义的
-         if @OrderPKNumType = 1
-         begin
-           update #GoodsPKNum
-           set    PKNum = b.OrderPKNum1,
-                  PKName = b.OrderPKName1,
-                  PKSpec = b.OrderPKSpec1
-           from   #GoodsPKNum a,GoodsPKNum b
-           where  a.GoodsID = b.GoodsID and DCShopID = @MyShopID;
-         END
-         ELSE IF @OrderPKNumType = 2
-         begin
-           update #GoodsPKNum
-           set    PKNum = b.OrderPKNum2,
-                  PKName = b.OrderPKName2,
-                  PKSpec = b.OrderPKSpec2
-           from   #GoodsPKNum a,GoodsPKNum b
-           where  a.GoodsID = b.GoodsID and DCShopID = @MyShopID;
-         END;
-         ELSE IF @OrderPKNumType = 3
-         BEGIN
-           update #GoodsPKNum
-           set    PKNum = b.OrderPKNum3,
-                 PKName = b.OrderPKName3,
-                 PKSpec = b.OrderPKSpec3
-           from   #GoodsPKNum a,GoodsPKNum b
-           where  a.GoodsID = b.GoodsID and DCShopID = @MyShopID;
-         END;
-
-         select @ManageDeptID=b.sgroupid,@Paytypeid=b.paytypeid,@Venderid=b.venderid,@MasterVenderID=b.MasterVenderID
-         from (select distinct venderid from InterFaceWMSDB.dbo.FR_RECEIPT where Refsheetid=@Sheetid) a,vender b
-         where a.venderid=b.venderid;
-
-         
-         select @Operator=max(Operator) from InterFaceWMSDB.dbo.FR_RECEIPT where Refsheetid=@Sheetid;
-
-         --计算默认存货地
-         select @PlaceID=null;
-         if @StockPlaceMode=0 begin	--按类别管理
-		   execute TL_DeptPlace 0,@ManageDeptID, @PlaceID out;
-		   IF @PlaceID IS NULL SELECT @PlaceID=0
-         END
-         ELSE BEGIN			--按业务类型管理
-		   select @PlaceID=ID from place where type=2 and clearflag=0 and Flag=0;	--存拣仓/卖场
-		   select @Err = @@error;
-		   if @Err != 0 goto ErrHandle;
-		   IF @PlaceID IS NULL BEGIN
-			 select @Msg='存货地配置错误!';
-			 goto ErrHandle;
-		  END
-         END
-
-         if Charindex(',' + Cast(@ManageDeptID as varchar(50)) + ',', @FreshWMSManage) > 0  --生鲜取订单进价，即保持原有进价不变
-            select @NewCostFlag=1;
-	     --写入表头
-     
-	     SELECT @SendNO=MAX(sheetid) FROM interfaceWMSDB.dbo.FR_RECEIPT WHERE refSheetID=@sheetid;
-         Insert into Receipt0
-	     (SheetID,RefSheetID,ShopID,ManageDeptID,ReceiptFlag,VenderID,PayTypeID,Logistics,Notes,
-	      Flag,Editor,EditDate,Operator,Checker,CheckDate,PlaceID,MasterVenderID)
-         Values(@NewSheetID,@SendNO,@MyShopID,@ManageDeptID,3,@VenderID,@PayTypeID,1,'WMS上传紧急验收单',0,@Operator,Getdate(),@Operator,@Operator,Getdate(),@PlaceID,@MasterVenderID)
-         select @Err = @@error;
-         if @Err != 0 goto ErrHandle;
-
-	     --写入表体
-         Insert into ReceiptItem0
-	      (SheetID,GoodsID,BarCodeID,PKNum,DeptID,OrderQty,OrderPresentQty,Qty,PresentQty,Cost,Price,Taxrate,PromFlag,PkName,PkSpec,notes,ProductDate)
-         select @NewSheetID,a.GoodsID,b.barcodeID,c.pknum,b.deptid,0,0,a.qty,0,case when @NewCostFlag=0 OR a.cost=0 then e.cost else a.cost end,d.price,e.costtaxrate,e.promflag,c.pkname,c.pkspec,'', a.ProductDate
-         from (select RefSheetID,GoodsID,Sum(Qty) as Qty,Sum(Qty*Cost)/Sum(Qty) as Cost,max(Venderid) as venderid,ProductDate 
-         from InterFaceWMSDB.dbo.FR_RECEIPT where Qty<>0 and RefSheetID=@SheetID Group by RefSheetID,GoodsID,ProductDate) a,goods b,#GoodsPKNum c,goodsshop d,cost e
-         where a.RefSheetID=@SheetID and a.goodsid=b.goodsid and a.goodsid=c.goodsid and a.goodsid=d.goodsid and d.shopid=@myshopid and a.goodsid=e.goodsid
-         and e.shopid=@myshopid and e.venderid=a.venderid;
-
-         select @Err = @@error;
-         if @Err != 0 goto ErrHandle;
-     
-         select @Count=isnull(count(*),0) from ReceiptItem0 where SheetID=@NewSheetid;
-         IF @NewCostFlag=0  --取当前进价
-           INSERT INTO FreshWMS_SheetGoodsCostInfo
-           (SheetType,SheetID,GoodsCostID,a.GoodsID,VenderID,Cost,Qty)
-           SELECT DISTINCT 2301,@Newsheetid,a.LotNo,a.GoodsID,CASE WHEN ISNUMERIC(a.VenderID)=0 THEN -1 ELSE a.VenderID END,b.Cost,a.Qty
-           FROM interfaceWMSDB.dbo.FR_RECEIPT a,cost b WHERE a.GoodsID=b.GoodsID AND a.VenderID=b.VenderID AND
-           a.RefSheetID=@SheetID AND Qty<>0 AND LotNo<>-1
-         ELSE
-         INSERT INTO FreshWMS_SheetGoodsCostInfo
-               (SheetType,SheetID,GoodsCostID,a.GoodsID,VenderID,Cost,Qty)
-         select distinct 2301,@Newsheetid,LotNo,GoodsID,case when ISNUMERIC(VenderID)=0 then -1 else VenderID end,Cost,Qty
-         from interfaceWMSDB.dbo.FR_RECEIPT where RefSheetID=@SheetID and Qty<>0 and LotNo<>-1;   
-         if @@RowCount>@Count begin
-           select @Msg='验收单对应商品资料不齐全，未按回传数据生成表体！';
-           select @Err=-1;
-           goto ErrHandle;
-         END;    
-
-      	 exec @Err=ST_Receipt @NewSheetID,'WMS';
-	 if @@error !=0 select @Err=@@error
-	 if (@Err is null) or (@Err <> 0) begin
-		select @Msg='验收单审核错误!'
-		goto ErrHandle;
-	 END;    
-	  
-	  IF EXISTS (SELECT 1 FROM interfaceWMSDB.dbo.fr_receipt WHERE RefSheetID=@sheetid AND cost<>base_cost)
-	    BEGIN 
-	    SELECT @BreakPoint=22038001
-         execute @Err=TL_GetNewSheetID 220381,@fyNewSheetID output;
-         if @Err <> 0 or @Err is null begin
-         	select @Msg='生鲜费用单单号生成失败!'
-              goto ErrHandle;
-              END
-       INSERT INTO dbo.FreshExpense0
-              ( SheetID ,Flag , Editor ,EditDate ,Operator , Checker ,CheckDate ,ShopID , RefSheetID,SheetFlag)
-       Values(@fyNewSheetID,0,'WMS',GETDATE(),'WMS',@Operator,Getdate(),@MyShopID,@NewSheetID,0)
-       INSERT INTO dbo.FreshExpenseItem0
-               ( SheetID ,goodsid , subitem_iid ,Cost ,CostValue)
-       SELECT @fyNewSheetID,goodsid,ROW_NUMBER()OVER(ORDER BY GOODSID) ,base_cost ,base_cost*qty FROM interfaceWMSDB.dbo.FR_RECEIPT
-       WHERE refsheetid=@sheetid;
-       
-       EXEC @Err=ST_ReceiptExpense @fyNewSheetID,'WMS';
-	 if (@Err is null) or (@Err <> 0) begin
-		select @Msg='生鲜费用单审核错误!'
-		goto ErrHandle;
-	 END;   
-	 
-      UPDATE Receipt SET KXCalculated=1 WHERE SheetID=@NewSheetID ;
-      END
-       END else */  BEGIN --已有验收单......
+       --已有验收单......
 	     Update Receiptitem0
 	     Set Qty=0,PresentQty=0
        	 where SheetID=@ASheetID;
@@ -541,7 +374,7 @@ AS BEGIN
          select @Err = @@error;
          if @Err != 0 goto ErrHandle;
 
-         select @ManageDeptID =ManageDeptID From Receipt0 where SheetID=@ASheetID;         
+         select @ManageDeptID =ManageDeptID, @VenderID = venderid From Receipt0 where SheetID=@ASheetID;         
          IF CHARINDEX(',' + CAST(@ManageDeptID AS VARCHAR(50)) + ',', @FreshWMSManage) > 0 	--冷链仓库部类单据
            AND EXISTS(SELECT 1 FROM interfaceWMSDB.dbo.FR_RECEIPT WHERE refSheetID=@SheetID AND LotNo<>-1)
          BEGIN
@@ -673,33 +506,21 @@ AS BEGIN
 		       goto ErrHandle;
 	       END;
 
-		--未知用途
-       /*IF EXISTS (SELECT 1 FROM interfaceWMSDB.dbo.fr_receipt WHERE RefSheetID=@sheetid AND cost<>base_cost)
-	   BEGIN 
-	     SELECT @BreakPoint=22038101
-         execute @Err=TL_GetNewSheetID 220381,@fyNewSheetID output;
-         if @Err <> 0 or @Err is null begin
-         	select @Msg='生鲜费用单单号生成失败!'
-              goto ErrHandle;
-         END
-         INSERT INTO dbo.FreshExpense0
-              ( SheetID ,Flag , Editor ,EditDate ,Operator , Checker ,CheckDate ,ShopID , RefSheetID,SheetFlag)
-         Values(@fyNewSheetID,0,'WMS',GETDATE(),'WMS',@Operator,Getdate(),@MyShopID,@NewSheetID,0)
-         INSERT INTO dbo.FreshExpenseItem0
-               ( SheetID ,goodsid , subitem_iid ,Cost ,CostValue)
-         SELECT @fyNewSheetID,goodsid,ROW_NUMBER()OVER(ORDER BY GOODSID) ,base_cost ,base_cost*qty FROM interfaceWMSDB.dbo.FR_RECEIPT
-         WHERE refsheetid=@sheetid;
-       
-         EXEC @Err=ST_ReceiptExpense @fyNewSheetID,'WMS';
-	     if (@Err is null) or (@Err <> 0) begin
-		   select @Msg='生鲜费用单审核错误!'
-		   goto ErrHandle;
-	     END;   
-	 
-         UPDATE Receipt SET KXCalculated=1 WHERE SheetID=@NewSheetID ;
-       END*/
+		 --批销处理
+		 select @pxvenderid = value from config where name = 'PX批销供应商'
+		 if @pxvenderid is null set @pxvenderid = -1;
 
-       END;
+		 if @pxvenderid > 0  and @pxvenderid = @VenderID  begin
+		   if exists(select 1 from px_order where orderno = @SheetID) begin
+		     update px_order set deliveryStatus = -2, ReceiptSheetId = @ASheetID
+			 where orderno = @SheetID;
+
+			 update px_Order_Items set ReceiptQty = b.qty
+			   from px_Order_Items a
+			     left join ReceiptItem b on a.goodsid = b.goodsid and b.sheetid = @ASheetID
+			 where orderno = @SheetID;
+		   end;
+		 end;
      end else IF @ERPSheetType=2303 BEGIN
          select @ManageDeptID=ManageDeptID from CRReceipt0 where SheetID=@ASheetID;
          if Charindex(',' + Cast(@ManageDeptID as varchar(50)) + ',', @FreshWMSManage) > 0  --生鲜取订单进价，即保持原有进价不变

@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Date;
 
 /**
@@ -28,7 +29,7 @@ public class OrderDo implements Serializable {
     private Date orderDate;
     private Date deliveryDate;
     private String orderTitle;
-    //0未交货 1部分交货 2全部交货 -1待推送
+    //0未交货 1部分交货 2全部交货 -1待推送 -2验收待推送
     private String deliveryStatus;
 
     @Override
@@ -58,5 +59,10 @@ public class OrderDo implements Serializable {
 
     public ReqOrderSaveVo toReqOrderSaveVo(){
         return JSONObject.from(this).toJavaObject(ReqOrderSaveVo.class);
+    }
+
+    public ReqReceiveVo toReqReceiveVo(){
+        ReqReceiveVo result = JSONObject.from(this).toJavaObject(ReqReceiveVo.class);
+        return result;
     }
 }

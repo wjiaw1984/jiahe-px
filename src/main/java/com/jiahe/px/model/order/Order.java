@@ -1,8 +1,6 @@
 package com.jiahe.px.model.order;
 
 import com.alibaba.fastjson2.JSONObject;
-import com.alibaba.fastjson2.annotation.JSONField;
-import com.jiahe.px.common.core.utils.Convert;
 import com.jiahe.px.model.YHRequestBase;
 import lombok.Data;
 import org.springframework.util.StringUtils;
