@@ -660,7 +660,7 @@ AS BEGIN
 		insert into px_Order_Items (orderNo,goodscode,BarCode,GoodsId)
 		select @WMSSheetID, b.goodscode, b.barcode, a.goodsid
 		from ReceiptItem0 a
-		  inner join px_goods_price b on a.goodsid = b.goodsid 
+		  inner join px_goods_price b on a.barcodeid = b.barCode 
 		where a.sheetid = @SheetID;
 	  end;
   end;

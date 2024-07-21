@@ -23,7 +23,8 @@ go
 
 
 create index i1_px_goods_price on px_goods_price(goodsid);
-create index i2_px_goods_price on px_goods_price(goodsCode,barCode);
+create unique index i2_px_goods_price on px_goods_price(barCode);
+create index i3_px_goods_price on px_goods_price(goodscode);
 Go
 
 if  exists(select 1 from sysobjects where id = object_id('px_order_items') and xtype = 'U')
@@ -88,6 +89,7 @@ go
 create index i1_px_Order_Items on px_Order_Items(orderno);
 create index i2_px_Order_Items on px_Order_Items(GoodsCode);
 create index i3_px_Order_Items on px_Order_Items(BarCode);
+create unique index i4_px_Order_Items on px_Order_Items(orderno,GoodsCode,BarCode);
 go
 
 if not exists(select 1 from config () where name = 'PX批销供应商')
