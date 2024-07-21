@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration debug="false" scan="true" scanPeriod="1 seconds">
+    <property name="contextname" value="jiahe-px-controller"/>
+    <contextName>${contextname}</contextName>
+    <springProperty scope="context" name="logPath" source="log.path" defaultValue="./logs/${contextname}"/>
+    <springProperty scope="context" name="logServer" source="log.server" defaultValue="127.0.0.1:5068"/>
+    <springProperty scope="context" name="logLevel" source="log.Level" defaultValue="info"/>
+
+    <property name="log.path" value="${logPath}"/>
+    <property name="log.info.path" value="${log.path}/info/info.log"/>
+    <property name="log.warn.path" value="${log.path}/warn/warn.log"/>
+    <property name="log.error.path" value="${log.path}/error/error.log"/>
+    <property name="log.debug.path" value="${log.path}/debug/debug.log"/>
+    <property name="log.server" value="${logServer}"/>
+    <property name="log.level" value="${logLevel}"/>
+
+    <property name="CONSOLE_LOG_PATTERN"
+              value="%date{yyyy-MM-dd HH:mm:ss} | %contextName | %highlight(%-5level) | %boldYellow(%thread) | %boldGreen(%logger) | %msg%n"/>
+
+    <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>${CONSOLE_LOG_PATTERN}</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="warn" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${log.warn.path}</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>${log.warn.path}_%d{yyyy-MM-dd}.%i</fileNamePattern>
+            <!--日志文件保留天数-->
+            <maxHistory>20</maxHistory>
+            <maxFileSize>100MB</maxFileSize>
+            <totalSizeCap>3GB</totalSizeCap>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd 'at' HH:mm:ss z} %-5level %class{26} %L %M - %msg%xEx%n
+            </pattern>
+        </encoder>
+        <filter class = "ch.qos.logback.classic.filter.LevelFilter">
+            <!--过滤级别 -->
+            <level>warn</level>
+            <!--匹配时的操作: 接收（记录） -->
+            <onMatch>ACCEPT</onMatch>
+            <!--不匹配时的操作: 不接收（不记录） -->
+            <onMismatch>DENY</onMismatch>
+        </filter>
+    </appender>
+
+    <appender name="info" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${log.info.path}</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>${log.info.path}_%d{yyyy-MM-dd}.%i</fileNamePattern>
+            <!--日志文件保留天数-->
+            <maxHistory>20</maxHistory>
+            <maxFileSize>100MB</maxFileSize>
+            <totalSizeCap>3GB</totalSizeCap>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd 'at' HH:mm:ss z} %-5level %class{26} %L %M - %msg%xEx%n
+            </pattern>
+        </encoder>
+        <filter class = "ch.qos.logback.classic.filter.LevelFilter">
+            <!--过滤级别 -->
+            <level>info</level>
+            <!--匹配时的操作: 接收（记录） -->
+            <onMatch>ACCEPT</onMatch>
+            <!--不匹配时的操作: 不接收（不记录） -->
+            <onMismatch>DENY</onMismatch>
+        </filter>
+    </appender>
+
+    <appender name="error" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${log.error.path}</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>${log.error.path}_%d{yyyy-MM-dd}.%i</fileNamePattern>
+            <!--日志文件保留天数-->
+            <maxHistory>20</maxHistory>
+            <maxFileSize>100MB</maxFileSize>
+            <totalSizeCap>3GB</totalSizeCap>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd 'at' HH:mm:ss z} %-5level %class{26} %L %M - %msg%xEx%n
+            </pattern>
+        </encoder>
+        <filter class = "ch.qos.logback.classic.filter.LevelFilter">
+            <!--过滤级别 -->
+            <level>error</level>
+            <!--匹配时的操作: 接收（记录） -->
+            <onMatch>ACCEPT</onMatch>
+            <!--不匹配时的操作: 不接收（不记录） -->
+            <onMismatch>DENY</onMismatch>
+        </filter>
+    </appender>
+
+    <appender name="debug" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${log.debug.path}</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>${log.debug.path}_%d{yyyy-MM-dd}.%i</fileNamePattern>
+            <!--日志文件保留天数-->
+            <maxHistory>20</maxHistory>
+            <maxFileSize>100MB</maxFileSize>
+            <totalSizeCap>3GB</totalSizeCap>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd 'at' HH:mm:ss z} %-5level %class{26} %L %M - %msg%xEx%n
+            </pattern>
+        </encoder>
+        <filter class = "ch.qos.logback.classic.filter.LevelFilter">
+            <!--过滤级别 -->
+            <level>debug</level>
+            <!--匹配时的操作: 接收（记录） -->
+            <onMatch>ACCEPT</onMatch>
+            <!--不匹配时的操作: 不接收（不记录） -->
+            <onMismatch>DENY</onMismatch>
+        </filter>
+    </appender>
+
+    <logger name="com.jiahe.px.mybatis.dao" level="debug"/>
+    <root  level="info">
+        <appender-ref ref="console"/>
+        <appender-ref ref="warn"/>
+        <appender-ref ref="error"/>
+        <appender-ref ref="info"/>
+        <appender-ref ref="debug"/>
+    </root>
+
+</configuration>

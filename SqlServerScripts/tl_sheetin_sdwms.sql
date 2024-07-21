@@ -416,7 +416,7 @@ AS BEGIN
 		     update px_order set deliveryStatus = -2, ReceiptSheetId = @ASheetID
 			 where orderno = @SheetID;
 
-			 update px_Order_Items set ReceiptQty = b.qty + b.PresentQty, 
+			 update px_Order_Items set ReceiptQty = b.qty + b.PresentQty, receiptdate = getdate()
 			   from px_Order_Items a
 			     left join ReceiptItem b on a.barcode = b.barcodeid and b.sheetid = @ASheetID
 			 where orderno = @SheetID;

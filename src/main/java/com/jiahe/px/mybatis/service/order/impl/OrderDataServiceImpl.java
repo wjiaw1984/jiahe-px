@@ -57,7 +57,6 @@ public class OrderDataServiceImpl extends ServiceImpl<IOrderMapper, OrderDo> imp
         return result;
     }
 
-    @Override
     public List<OrderDo> listByDeliveryStatus(List<String> deliveryStatus) {
         QueryWrapper<OrderDo> qw = new QueryWrapper<>();
         qw.in("deliveryStatus", deliveryStatus);

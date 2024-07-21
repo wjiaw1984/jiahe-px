@@ -92,7 +92,7 @@ create index i3_px_Order_Items on px_Order_Items(BarCode);
 create unique index i4_px_Order_Items on px_Order_Items(orderno,GoodsCode,BarCode);
 go
 
-if not exists(select 1 from config () where name = 'PX批销供应商')
+if not exists(select 1 from config where name = 'PX批销供应商')
   insert into config (systemid,name,value,note)
   values(22,'PX批销供应商','-1','-1 没有PX批销供应商');
   

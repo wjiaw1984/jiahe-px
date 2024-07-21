@@ -63,8 +63,10 @@ public class PxGoodsPriceDataServiceImpl extends ServiceImpl<IPxGoodsPriceMapper
             }
         } else {
             try {
-                if (!pxGoodsPriceDo.getBarCode().equals(entity.getBarCode())) {
-                    pxGoodsPriceDo.setBarCode(entity.getBarCode());
+                Boolean isUpdate = false;
+                if (!pxGoodsPriceDo.getGoodsCode().equals(entity.getGoodsCode())) {
+                    pxGoodsPriceDo.setGoodsCode(entity.getGoodsCode());
+                    isUpdate = true;
                 }
 
                 if ((StringUtils.isEmpty(pxGoodsPriceDo.getInventory()) && !StringUtils.isEmpty(entity.getInventory()))
@@ -72,6 +74,7 @@ public class PxGoodsPriceDataServiceImpl extends ServiceImpl<IPxGoodsPriceMapper
                         || (!StringUtils.isEmpty(pxGoodsPriceDo.getInventory()) && !StringUtils.isEmpty(entity.getInventory()))) {
                     if (!pxGoodsPriceDo.getInventory().equals(entity.getInventory())) {
                         pxGoodsPriceDo.setInventory(entity.getInventory());
+                        isUpdate = true;
                     }
                 }
 
@@ -80,6 +83,7 @@ public class PxGoodsPriceDataServiceImpl extends ServiceImpl<IPxGoodsPriceMapper
                         || (pxGoodsPriceDo.getPrice() != null && StringUtils.isEmpty(entity.getPrice()))) {
                     if (pxGoodsPriceDo.getPrice().compareTo(Convert.ToDecimal(entity.getPrice())) != 0) {
                         pxGoodsPriceDo.setPrice(Convert.ToDecimal(entity.getPrice()));
+                        isUpdate = true;
                     }
                 }
 
@@ -88,6 +92,7 @@ public class PxGoodsPriceDataServiceImpl extends ServiceImpl<IPxGoodsPriceMapper
                         || (!StringUtils.isEmpty(pxGoodsPriceDo.getIsDirect()) && !StringUtils.isEmpty(entity.getIsDirect()))) {
                     if (!pxGoodsPriceDo.getIsDirect().equals(entity.getIsDirect())) {
                         pxGoodsPriceDo.setIsDirect(entity.getIsDirect());
+                        isUpdate = true;
                     }
                 }
 
@@ -96,7 +101,12 @@ public class PxGoodsPriceDataServiceImpl extends ServiceImpl<IPxGoodsPriceMapper
                         || (!StringUtils.isEmpty(pxGoodsPriceDo.getMatnr()) && !StringUtils.isEmpty(entity.getMatnr()))) {
                     if (!pxGoodsPriceDo.getMatnr().equals(entity.getMatnr())) {
                         pxGoodsPriceDo.setMatnr(entity.getMatnr());
+                        isUpdate = true;
                     }
+                }
+
+                if (!isUpdate){
+                    pxGoodsPriceDo = null;
                 }
             } catch (Exception e) {
                 String errMsg = String.format("updateByPxGoodsItem {%s} error:{%s}", "更新数据表[px_goods_price]", e.getMessage());
