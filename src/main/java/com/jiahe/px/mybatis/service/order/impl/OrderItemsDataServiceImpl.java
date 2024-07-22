@@ -7,6 +7,7 @@ import com.jiahe.px.mybatis.dao.order.IOrderItemsMapper;
 import com.jiahe.px.mybatis.service.order.IOrderItemsDataService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import java.util.List;
 
@@ -27,6 +28,9 @@ public class OrderItemsDataServiceImpl extends ServiceImpl<IOrderItemsMapper, Or
 
     @Override
     public List<OrderItemsDo> listInOrderNo(List orderNos) {
+        if (CollectionUtils.isEmpty(orderNos)) {
+            return null;
+        }
         QueryWrapper<OrderItemsDo> qw = new QueryWrapper<>();
         qw.in("orderNo", orderNos);
         return list(qw);

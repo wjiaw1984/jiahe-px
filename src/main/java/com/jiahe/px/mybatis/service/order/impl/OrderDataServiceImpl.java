@@ -79,6 +79,9 @@ public class OrderDataServiceImpl extends ServiceImpl<IOrderMapper, OrderDo> imp
     public List<ReqOrderSaveVo> listReqOrderSaveByDeliveryStatus(List<String> deliveryStatus) {
         try {
             List<ReqOrderSaveVo> result = toReqOrderSaveVo(listByDeliveryStatus(deliveryStatus));
+            if (CollectionUtils.isEmpty(result)){
+                return null;
+            }
             List<String> orderNos = result.stream().map(ReqOrderSaveVo::getOrderNo).collect(Collectors.toList());
             List<OrderItemsDo> orderItemsList = orderItemsDataService.listInOrderNo(orderNos);
             for (ReqOrderSaveVo item : result) {
@@ -112,6 +115,9 @@ public class OrderDataServiceImpl extends ServiceImpl<IOrderMapper, OrderDo> imp
     public List<ReqReceiveVo> listReqReceiveByDeliveryStatus(String deliveryStatus) {
         try {
             List<ReqReceiveVo> result = toReqReceiveVo(listByDeliveryStatus(deliveryStatus));
+            if (CollectionUtils.isEmpty(result)){
+                return null;
+            }
             List<String> orderNos = result.stream().map(ReqReceiveVo::getOrderNo).collect(Collectors.toList());
             List<OrderItemsDo> orderItemsList = orderItemsDataService.listInOrderNo(orderNos);
             for (ReqReceiveVo item : result) {

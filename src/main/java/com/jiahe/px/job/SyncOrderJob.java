@@ -18,7 +18,7 @@ public class SyncOrderJob extends QuartzJobBean {
     @Override
     protected void executeInternal(JobExecutionContext jobExecutionContext) throws JobExecutionException {
         log.info("SyncOrderJob start");
-        //pxOrderService.syncOrder();
+        pxOrderService.syncOrder();
         log.info("SyncOrderJob end");
     }
 }

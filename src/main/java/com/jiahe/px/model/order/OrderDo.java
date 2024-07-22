@@ -1,6 +1,7 @@
 package com.jiahe.px.model.order;
 
 import com.alibaba.fastjson2.JSONObject;
+import com.alibaba.fastjson2.annotation.JSONField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
@@ -26,7 +27,9 @@ public class OrderDo implements Serializable {
     private String orderAddress;
     private String contactPerson;
     private String contactPhone;
+    @JSONField(format = "yyyy-MM-dd")
     private Date orderDate;
+    @JSONField(format = "yyyy-MM-dd")
     private Date deliveryDate;
     private String orderTitle;
     //0未交货 1部分交货 2全部交货 -1待推送 -2验收待推送

@@ -1,6 +1,7 @@
 package com.jiahe.px.model.order;
 
 import com.alibaba.fastjson2.JSONObject;
+import com.alibaba.fastjson2.annotation.JSONField;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -29,6 +30,7 @@ public class OrderItemsDo implements Serializable {
     private String deliveryNum;
     private BigDecimal price;
     private String deliveryStatus;
+    @JSONField (format = "yyyy-MM-dd")
     private Date deliveryDate;
     //erp验收数量
     private BigDecimal receiptQty;

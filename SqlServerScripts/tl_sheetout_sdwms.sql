@@ -653,12 +653,12 @@ AS BEGIN
 	  ------------------增加批销处理-----------------------
 	  if @pxvenderid <> -1 and @pxvenderid = @VenderId begin
 	    insert into px_order (sheetid,sheettype,orderNo,shopNo,orderType,orderDate,deliveryDate,orderTitle,deliveryStatus)
-		select @WMSSheetID,2301,@WMSSheetID,a.shopid,'Z001',@PurDate,@ValidDate,notes,-1
+		select rtrim(@WMSSheetID),2301,rtrim(@WMSSheetID),rtrim(a.shopid),'Z001',@PurDate,@ValidDate,rtrim(notes),-1
 		from Receipt0 a
 		where a.sheetid = @SheetID;
 
 		insert into px_Order_Items (orderNo,goodscode,BarCode,GoodsId)
-		select @WMSSheetID, b.goodscode, b.barcode, a.goodsid
+		select rtrim(@WMSSheetID), rtrim(b.goodscode), rtrim(b.barcode), a.goodsid
 		from ReceiptItem0 a
 		  inner join px_goods_price b on a.barcodeid = b.barCode 
 		where a.sheetid = @SheetID;

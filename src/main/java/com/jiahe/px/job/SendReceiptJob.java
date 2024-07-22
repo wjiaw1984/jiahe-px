@@ -19,7 +19,7 @@ public class SendReceiptJob extends QuartzJobBean {
     protected void executeInternal(org.quartz.JobExecutionContext context) throws JobExecutionException {
         log.info("推送验收单定时任务开始");
         // 执行推送验收单的逻辑
-        //pxOrderService.sendReceipt();
+        pxOrderService.sendReceipt();
         log.info("推送验收单定时任务结束");
     }
 }

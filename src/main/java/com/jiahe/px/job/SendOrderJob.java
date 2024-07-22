@@ -18,7 +18,7 @@ public class SendOrderJob extends QuartzJobBean {
     @Override
     protected void executeInternal(JobExecutionContext jobExecutionContext) throws JobExecutionException {
         log.info("SendOrderJob start");
-        //pxOrderService.sendOrder();
+        pxOrderService.sendOrder();
         log.info("SendOrderJob end");
     }
 }
