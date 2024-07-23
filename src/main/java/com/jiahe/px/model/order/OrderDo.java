@@ -4,6 +4,7 @@ import com.alibaba.fastjson2.JSONObject;
 import com.alibaba.fastjson2.annotation.JSONField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
+import org.springframework.util.StringUtils;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -65,7 +66,17 @@ public class OrderDo implements Serializable {
     }
 
     public ReqReceiveVo toReqReceiveVo(){
+        if (StringUtils.isEmpty(this.orderTitle)){
+            this.orderTitle = null;
+        }
         ReqReceiveVo result = JSONObject.from(this).toJavaObject(ReqReceiveVo.class);
+        result.setOrderAddress(null);
+        result.setOrderDate(null);
+        result.setOrderType(null);
+        result.setContactPerson(null);
+        result.setContactPhone(null);
+        result.setShopNo(null);
+        result.setDeliveryDate(null);
         return result;
     }
 }

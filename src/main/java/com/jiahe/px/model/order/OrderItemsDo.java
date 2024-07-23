@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.jiahe.px.common.core.utils.Convert;
 import lombok.Data;
+import org.springframework.util.StringUtils;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -59,7 +60,7 @@ public class OrderItemsDo implements Serializable {
     }
     public ReceiveItemVo toReceiveItem(){
         ReceiveItemVo result = JSONObject.from(this).toJavaObject(ReceiveItemVo.class);
-        result.setReceiveNum(Convert.ToString(receiptQty.setScale(2)));
+        result.setReceiveNum(Convert.ToString(receiptQty.setScale(3)));
         result.setReceiveDate(Convert.dateFormat(receiptDate,"yyyy-MM-dd"));
         return result;
     }

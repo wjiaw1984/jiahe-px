@@ -52,7 +52,7 @@ public class QuartzConfig  {
         CronTrigger trigger = TriggerBuilder.newTrigger()
                 .forJob(sendReceiptJobDetail())
                 .withIdentity("sendReceiptJobTrigger")
-                .withSchedule(CronScheduleBuilder.cronSchedule("*/7 * * * * ?"))
+                .withSchedule(CronScheduleBuilder.cronSchedule("*/15 * * * * ?"))
                 .build();
         return trigger;
     }
@@ -71,7 +71,7 @@ public class QuartzConfig  {
         CronTrigger trigger = TriggerBuilder.newTrigger()
                 .forJob(syncOrderJobDetail())
                 .withIdentity("syncOrderJobTrigger")
-                .withSchedule(CronScheduleBuilder.cronSchedule("*/10 * * * * ?"))
+                .withSchedule(CronScheduleBuilder.cronSchedule("* */15 * * * ?"))
                 .build();
         return trigger;
     }
@@ -92,7 +92,7 @@ public class QuartzConfig  {
                 .forJob(syncGoodsPriceJobDetail())
                 .withIdentity("syncGoodsPriceJobTrigger")
                 // 每天凌晨1点执行
-                .withSchedule(CronScheduleBuilder.cronSchedule("*/15 * * * * ?"))
+                .withSchedule(CronScheduleBuilder.cronSchedule("0 0 3 * * ?"))
                 .build();
         return trigger;
     }
