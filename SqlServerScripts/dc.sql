@@ -15,6 +15,7 @@ create table dbo.px_goods_price
   barCode			varchar(32),									--批销商品条码
   matnr				varchar(32),									--批销大张商品名称
   isDirect			varchar(32),									--批销是否直流
+  maktx				varchar(64),									--物料名称
   primary key(id)
 );
 
@@ -38,7 +39,7 @@ Go
 
 create table dbo.px_order
 (
-  id				bigint  not null,
+  id				bigint IDENTITY(1,1) not null,
   createTime		datetime default getdate() not null,			--创建日期
   lastUpdateTime	datetime default getdate() not null,            --最后更新日期
   sheetid			varchar(32),									--erp相关单据号
@@ -66,7 +67,7 @@ create index i2_px_order on px_order(sheetid,sheettype);
 Go
 
 CREATE TABLE [dbo].[px_Order_Items](
-	[Id] 										[INT] PRIMARY KEY,
+	[Id] 										[INT] IDENTITY(1,1) PRIMARY KEY,
 	createTime		datetime default getdate() not null,				--创建日期
     lastUpdateTime	datetime default getdate() not null,				--最后更新日期
 	[orderNo]								[varchar](32) not null,		--批销订单号

@@ -4,7 +4,7 @@
 
     <groupId>com.jiahe</groupId>
     <artifactId>px-web</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.3</version>
 
     <name>jiahe-px-web</name>
     <packaging>jar</packaging>
@@ -13,12 +13,6 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven-jar-plugin.version>3.0.0</maven-jar-plugin.version>
         <java.version>1.8</java.version>
-        <springboot.version>2.3.1.RELEASE</springboot.version>
-        <springcloud.version>Hoxton.SR6</springcloud.version>
-        <nacos-config.version>0.2.7</nacos-config.version>
-        <nacos-discovery.version>2.2.5.RELEASE</nacos-discovery.version>
-        <ftMicroBase.version>3.1.5.0-SNAPSHOT</ftMicroBase.version>
-        <myshopmodel.version>1.0.0</myshopmodel.version>
     </properties>
 
     <parent>

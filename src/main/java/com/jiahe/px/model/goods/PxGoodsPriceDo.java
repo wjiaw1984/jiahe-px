@@ -28,6 +28,7 @@ public class PxGoodsPriceDo implements Serializable {
     private String barCode;
     private String matnr;
     private String isDirect;
+    private String maktx;
 
     @Override
     public String toString() {
@@ -43,6 +44,7 @@ public class PxGoodsPriceDo implements Serializable {
                 ", barCode='" + barCode + '\'' +
                 ", matnr='" + matnr + '\'' +
                 ", isDirect='" + isDirect + '\'' +
+                ", maktx='" + maktx + '\'' +
                 '}';
     }
 }

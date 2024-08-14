@@ -1,7 +1,6 @@
-USE mySHOPDCStock
-GO
-SET ANSI_NULLS, QUOTED_IDENTIFIER ON
-GO
+IF exists(select 1 from sysobjects where id = OBJECT_ID('TL_SheetOut_SDWMS'))
+  drop proc TL_SheetOut_SDWMS
+Go
 
 CREATE PROCEDURE [dbo].[TL_SheetOut_SDWMS](@InterfaceSystem CHAR(8),@SheetID CHAR(32),@SheetType INT,@Out_ShopID VARCHAR(6) OUTPUT,@Out_SheetID VARCHAR(20) OUTPUT)
 ---------------------------------------------------------------------------------
@@ -657,10 +656,9 @@ AS BEGIN
 		from Receipt0 a
 		where a.sheetid = @SheetID;
 
-		insert into px_Order_Items (orderNo,goodscode,BarCode,GoodsId)
-		select rtrim(@WMSSheetID), rtrim(b.goodscode), rtrim(b.barcode), a.goodsid
+		insert into px_Order_Items (orderNo,goodscode,BarCode,GoodsId,num)
+		select rtrim(@WMSSheetID), a.goodsid, a.barcode, a.goodsid, a.OrderQty
 		from ReceiptItem0 a
-		  inner join px_goods_price b on a.barcodeid = b.barCode 
 		where a.sheetid = @SheetID;
 	  end;
   end;

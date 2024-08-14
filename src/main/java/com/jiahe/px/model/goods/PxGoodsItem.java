@@ -18,4 +18,6 @@ public class PxGoodsItem implements Serializable {
     private String barCode;
     private String matnr;
     private String isDirect;
+    //大张商品名称(可为空)
+    private String maktx;
 }

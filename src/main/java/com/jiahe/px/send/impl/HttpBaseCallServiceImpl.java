@@ -52,7 +52,7 @@ public class HttpBaseCallServiceImpl implements IHttpBaseCallService {
 
         Long timestamp = Convert.getSecondTimestamp();
         entity.setReqTime(timestamp);
-        entity.setCustomNo("0000601250");
+        entity.setCustomNo(appConfig.getCustomNo());
         entity.setAppId(appConfig.getAppId());
         entity.buildSign(appConfig.getAppSecret());
         Object[] paramArray;

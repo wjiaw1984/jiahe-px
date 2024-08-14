@@ -46,8 +46,18 @@ public class PxGoodsPriceServiceImpl implements IPxGoodsPriceService {
             params.setCurPageNo(pageNo);
             resPxGoodsPriceList = listPxGoodsPrice(params);
             if (!CollectionUtils.isEmpty(resPxGoodsPriceList.getGoods())){
-                pxGoodsPriceDataService.batchSaveOrUpdate(resPxGoodsPriceList.getGoods());
-                log.info("商品价格查询页["+params.getCurPageNo()+"]接口返回数据入库成功");
+                try {
+                    pxGoodsPriceDataService.batchSaveOrUpdate(resPxGoodsPriceList.getGoods());
+                    log.info("商品价格查询页["+params.getCurPageNo()+"]接口返回数据入库成功");
+                }catch (Exception e){
+                    log.error("商品价格查询页["+params.getCurPageNo()+"]接口返回数据入库失败");
+                }finally {
+                    //保存成功后，清除内存中的数据，防止内存溢出
+                    if (!CollectionUtils.isEmpty(resPxGoodsPriceList.getGoods())) {
+                        resPxGoodsPriceList.getGoods().clear();
+                    }
+                    resPxGoodsPriceList = null;
+                }
             }
         }while  (resPxGoodsPriceList.getTotalPage()>pageNo);
     }

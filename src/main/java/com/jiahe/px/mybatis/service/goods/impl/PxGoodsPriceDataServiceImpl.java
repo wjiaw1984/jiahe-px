@@ -53,6 +53,9 @@ public class PxGoodsPriceDataServiceImpl extends ServiceImpl<IPxGoodsPriceMapper
                 if (!StringUtils.isEmpty(entity.getPrice())) {
                     pxGoodsPriceDo.setPrice(Convert.ToDecimal(entity.getPrice()));
                 }
+                if (!StringUtils.isEmpty(entity.getMaktx())) {
+                    pxGoodsPriceDo.setMaktx(entity.getMaktx());
+                }
 
                 pxGoodsPriceDo.setIsDirect(entity.getIsDirect());
                 pxGoodsPriceDo.setMatnr(entity.getMatnr());

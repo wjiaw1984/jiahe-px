@@ -29,8 +29,7 @@ public class WebConfig extends WebMvcConfigurationSupport {
         //2.1配置序列化的行为
         //JSONWriter.Feature.PrettyFormat:格式化输出
         config.setWriterFeatures(JSONWriter.Feature.PrettyFormat,
-                JSONWriter.Feature.WriteMapNullValue,
-                JSONWriter.Feature.WriteNullListAsEmpty);
+                JSONWriter.Feature.WriteMapNullValue);
         //2.2配置反序列化的行为
         config.setReaderFeatures(JSONReader.Feature.FieldBased,
                 JSONReader.Feature.SupportArrayToBean,
