@@ -28,8 +28,7 @@ public class WebConfig extends WebMvcConfigurationSupport {
         config.setDateFormat("yyyy-MM-dd");
         //2.1配置序列化的行为
         //JSONWriter.Feature.PrettyFormat:格式化输出
-        config.setWriterFeatures(JSONWriter.Feature.PrettyFormat,
-                JSONWriter.Feature.WriteMapNullValue);
+        config.setWriterFeatures(JSONWriter.Feature.PrettyFormat);
         //2.2配置反序列化的行为
         config.setReaderFeatures(JSONReader.Feature.FieldBased,
                 JSONReader.Feature.SupportArrayToBean,

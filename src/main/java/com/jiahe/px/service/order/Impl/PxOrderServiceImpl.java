@@ -87,6 +87,7 @@ public class PxOrderServiceImpl implements IPxOrderService {
                     //调用接口查询订单状态
                     ReqQueryOrderVo entity = new ReqQueryOrderVo();
                     entity.setOrderNo(order.getOrderNo());
+                    entity.setShopNo(order.getShopNo());
                     BaseResponse<ResQueryOrderVo> response = httpBaseCallService.queryOrder(entity);
                     if ("0".equals(response.getCode())){
                         OrderDo orderDo = orderDataService.getOrderByOrderNo(order.getOrderNo());

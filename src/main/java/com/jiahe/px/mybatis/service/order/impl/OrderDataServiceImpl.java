@@ -41,6 +41,9 @@ public class OrderDataServiceImpl extends ServiceImpl<IOrderMapper, OrderDo> imp
             }
             log.info("转换成OrderItem对象成功");
         }
+        if (CollectionUtils.isEmpty(result)){
+            return null;
+        }
         return result;
     }
 

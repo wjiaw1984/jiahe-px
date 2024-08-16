@@ -12,11 +12,15 @@ import com.jiahe.px.model.order.ReqOrderSaveVo;
 import com.jiahe.px.model.order.ReqQueryOrderVo;
 import com.jiahe.px.model.order.ReqReceiveVo;
 import com.jiahe.px.model.order.ResQueryOrderVo;
+import com.jiahe.px.model.shop.ShopDo;
+import com.jiahe.px.mybatis.service.shop.IShopDataService;
 import com.jiahe.px.send.HttpInstance;
 import com.jiahe.px.send.IHttpBaseCallService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.util.Assert;
+import org.springframework.util.StringUtils;
 import retrofit2.Call;
 import retrofit2.Response;
 
@@ -31,15 +35,18 @@ public class HttpBaseCallServiceImpl implements IHttpBaseCallService {
     @Autowired
     AppConfig appConfig;
 
+    @Autowired
+    IShopDataService shopDataService;
+
     @Override
     public BaseResponse<ResPxGoodsPriceVo> goodsPriceQuery(ReqPxGoodsPriceVo entity) {
-        BaseResponse<ResPxGoodsPriceVo> result = call("goodsPriceQuery", entity);
-        JSONObject jsonObject = JSONObject.from(result.getData()) ;
+        BaseResponse<ResPxGoodsPriceVo> result = call("goodsPriceQuery", entity, null);
+        JSONObject jsonObject = JSONObject.from(result.getData());
         result.setData(jsonObject.toJavaObject(ResPxGoodsPriceVo.class));
         return result;
     }
 
-    public BaseResponse call(String getFuncName, YHRequestBase entity) {
+    public BaseResponse call(String getFuncName, YHRequestBase entity, String customNo) {
         Thread th = Thread.currentThread();
         long startTime = System.currentTimeMillis();
         BaseResponse resBody = null;
@@ -52,11 +59,17 @@ public class HttpBaseCallServiceImpl implements IHttpBaseCallService {
 
         Long timestamp = Convert.getSecondTimestamp();
         entity.setReqTime(timestamp);
-        entity.setCustomNo(appConfig.getCustomNo());
+
+        if (StringUtils.isEmpty(customNo)) {
+            entity.setCustomNo(appConfig.getCustomNo());
+        }else {
+            entity.setCustomNo(customNo);
+        }
+
         entity.setAppId(appConfig.getAppId());
         entity.buildSign(appConfig.getAppSecret());
         Object[] paramArray;
-            paramArray = new Object[]{entity};
+        paramArray = new Object[]{entity};
         try {
             log.info("线程【" + th.getId() + "】推送开始");
             call = (Call<BaseResponse>) HttpInstance.post(appConfig.getUrl(), getFuncName, paramArray);
@@ -93,27 +106,38 @@ public class HttpBaseCallServiceImpl implements IHttpBaseCallService {
 
         } catch (Exception ex) {
             log.error("线程【" + th.getId() + "】调用远程服务【" + getFuncName + "】异常：" + ex.getMessage());
-            throw new RuntimeException(String.format("远程服务异常: %s",ex.getMessage()));
+            throw new RuntimeException(String.format("远程服务异常: %s", ex.getMessage()));
         }
     }
 
     @Override
     public BaseResponse orderSave(ReqOrderSaveVo entity) {
-        BaseResponse result = call("orderSave", entity);
+        ShopDo shopDo = shopDataService.getById(entity.getShopNo());
+        Assert.isNull(shopDo,"门店[" + entity.getShopNo() + "]不存在!");
+        BaseResponse result = call("orderSave", entity, shopDo.getTaxno().trim());
         return result;
     }
 
     @Override
     public BaseResponse<ResQueryOrderVo> queryOrder(ReqQueryOrderVo entity) {
-        BaseResponse<ResQueryOrderVo> result = call("queryOrder", entity);
-        JSONObject jsonObject = JSONObject.from(result.getData()) ;
+        String customNo = null;
+        if (!StringUtils.isEmpty(entity.getShopNo())) {
+            ShopDo shopDo = shopDataService.getById(entity.getShopNo());
+            Assert.isNull(shopDo,"门店[" + entity.getShopNo() + "]不存在!");
+            customNo = shopDo.getTaxno().trim();
+        }
+
+        BaseResponse<ResQueryOrderVo> result = call("queryOrder", entity, customNo);
+        JSONObject jsonObject = JSONObject.from(result.getData());
         result.setData(jsonObject.toJavaObject(ResQueryOrderVo.class));
         return result;
     }
 
     @Override
     public BaseResponse receive(ReqReceiveVo entity) {
-        BaseResponse result = call("receive", entity);
+        ShopDo shopDo = shopDataService.getById(entity.getShopNo());
+        Assert.isNull(shopDo,"门店[" + entity.getShopNo() + "]不存在!");
+        BaseResponse result = call("receive", entity, shopDo.getTaxno().trim());
         return result;
     }
 }
