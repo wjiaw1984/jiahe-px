@@ -15,7 +15,7 @@ import java.math.BigDecimal;
  * @return
  **/
 @Data
-@TableName(value = "shop")
+@TableName(value = "shopview")
 public class ShopDo implements Serializable {
     private static final long serialVersionUID = 1L;
 

@@ -4,7 +4,7 @@
 
     <groupId>com.jiahe</groupId>
     <artifactId>px-web</artifactId>
-    <version>1.0.3</version>
+    <version>1.0.4</version>
 
     <name>jiahe-px-web</name>
     <packaging>jar</packaging>
