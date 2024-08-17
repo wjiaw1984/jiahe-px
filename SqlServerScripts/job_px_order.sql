@@ -32,7 +32,7 @@ AS BEGIN
 
   select @BreakPoint=100020;
   DECLARE Cur_px_order_log cursor local for 
-	select SerialID,refSheetType,refSheetId from px_order_log where status = '2';
+	select SerialID,refSheetType,refSheetId from px_order_log0 where status = '2';
   OPEN Cur_px_order_log
   select @Err = @@error;
   if @Err != 0 goto ErrHandle;
@@ -45,7 +45,7 @@ AS BEGIN
 	begin tran;
 	set @StartWork = 1;
 
-	update px_order_log set lastUpdateDate = getdate()
+	update px_order_log0 set lastUpdateDate = getdate()
 	where SerialID = @serialId;
 
 	if @refSheetType = 2001 begin  --创建订单
@@ -66,7 +66,7 @@ AS BEGIN
         if @Err != 0 begin
 		  if @StartWork = 1 rollback tran;
 		  begin tran;
-		  update px_order_log set msg = '写[v_px_order]数据失败',status = '99'
+		  update px_order_log0 set msg = '写[v_px_order]数据失败',status = '99'
 		  where SerialID = @serialId;
 		  commit tran;
 		end;
@@ -81,13 +81,13 @@ AS BEGIN
         if @Err != 0 begin
 		  if @StartWork = 1 rollback tran;
 		  begin tran;
-		  update px_order_log set msg = '写[v_px_order_items]数据失败',status = '99'
+		  update px_order_log0 set msg = '写[v_px_order_items]数据失败',status = '99'
 		  where SerialID = @serialId;
 		  commit tran;
 		end;
 	  end
 	  else begin
-	    update px_order_log set msg = '[v_px_order]查询重复批销订单',status = '99'
+	    update px_order_log0 set msg = '[v_px_order]查询重复批销订单',status = '99'
 		where SerialID = @serialId;
 
 		if @StartWork = 1
@@ -103,7 +103,7 @@ AS BEGIN
 	  select @PurSheetId = PurSheetID from receiptref where sheetid = @refSheetId;
 
 	  if @PurSheetId is null begin
-	    update px_order_log set msg = '[receiptref]查询不到相关订单号',status = '99'
+	    update px_order_log0 set msg = '[receiptref]查询不到相关订单号',status = '99'
 		where SerialID = @serialId;
 
 		if @StartWork = 1
@@ -123,7 +123,7 @@ AS BEGIN
         if @Err != 0 begin
 		  if @StartWork = 1 rollback tran;
 		  begin tran;
-		  update px_order_log set msg = '[v_px_order]更新失败',status = '99'
+		  update px_order_log0 set msg = '[v_px_order]更新失败',status = '99'
 		  where SerialID = @serialId;
 		  commit tran;
 		end;
@@ -137,13 +137,13 @@ AS BEGIN
 		if @Err != 0 begin
 		  if @StartWork = 1 rollback tran;
 		  begin tran
-		  update px_order_log set msg = '[v_px_order_items]更新失败',status = '99'
+		  update px_order_log0 set msg = '[v_px_order_items]更新失败',status = '99'
 		  where SerialID = @serialId;
 		  commit tran;
 		end;
 	  end
 	  else begin
-	    update px_order_log set msg = '[v_px_order]查询不到批销订单',status = '99'
+	    update px_order_log0 set msg = '[v_px_order]查询不到批销订单',status = '99'
 		where SerialID = @serialId;
 
 		if @StartWork = 1
@@ -153,7 +153,7 @@ AS BEGIN
 	  end;
 	end;
 
-	update px_order_log set status = '90'
+	update px_order_log0 set status = '90'
 		where SerialID = @serialId;
 
 	if @StartWork = 1
@@ -173,22 +173,14 @@ AS BEGIN
 
   select @Err = @@error;
   if @Err != 0 begin
-	if @StartWork = 1 rollback tran;
-	begin tran;
-	update px_order_log set msg = '写[px_order_log]数据失败',status = '99'
-	where SerialID = @serialId;
-	commit tran;  
+    goto ErrHandle;
   end;
 
   delete from px_order_log0
   where status = '90';
   select @Err = @@error;
   if @Err != 0 begin
-	if @StartWork = 1 rollback tran;
-	begin tran;
-	update px_order_log set msg = '备份数据后，清理[px_order_log0]数据失败',status = '99'
-	where SerialID = @serialId;
-	commit tran;  
+    goto ErrHandle;
   end;
 
   if @StartWork = 1

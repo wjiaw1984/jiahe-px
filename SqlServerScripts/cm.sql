@@ -42,8 +42,9 @@ FOR Insert AS
   select @pxvenderid = value from config where name = 'PX批销供应商'
   if @pxvenderid is null set @pxvenderid = -1;
 
-  insert into px_order_log0 (refSheetType,refSheetId)
-  select 2001,SheetID from Inserted where VenderID = @pxvenderid;
+   
+  select 2001,SheetID from Inserted where VenderID = @pxvenderid
+  and exists(select * from shop where id = Inserted.shopid and shoptype > 10 and shoptype < 90 and shoptype != 21)
 GO
 
 if exists (select * from dbo.sysobjects 
@@ -58,8 +59,10 @@ FOR Insert AS
   select @pxvenderid = value from config where name = 'PX批销供应商'
   if @pxvenderid is null set @pxvenderid = -1;
 
-  insert into px_order_log0 (refSheetType,refSheetId)
-  select 2002,SheetID from Receipt where flag = 100 and VenderID = @pxvenderid;
+  
+    insert into px_order_log0 (refSheetType,refSheetId)
+    select 2002,SheetID from Inserted where flag = 100 and VenderID = @pxvenderid
+      and exists(select 1 from shop where id = shopid and shoptype > 10 and shoptype < 90 and shoptype != 21)
 GO
 
 
