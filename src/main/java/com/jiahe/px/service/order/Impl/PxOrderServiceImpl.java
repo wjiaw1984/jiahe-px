@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import java.util.Arrays;
 import java.util.List;
@@ -53,16 +54,16 @@ public class PxOrderServiceImpl implements IPxOrderService {
         //获取待推送的订单
         List<String> statues = Arrays.asList("-1");
         List<ReqOrderSaveVo> orderList = orderDataService.listReqOrderSaveByDeliveryStatus(statues);
-        if (!CollectionUtils.isEmpty(orderList)){
+        if (!CollectionUtils.isEmpty(orderList)) {
             //待推送订单处理
-            for (ReqOrderSaveVo order : orderList){
+            for (ReqOrderSaveVo order : orderList) {
                 try {
                     httpBaseCallService.orderSave(order);
                     //没有异常的，更新订单状态
-                    orderDataService.updateStatus(order.getOrderNo(),"0");
-                }catch (Exception e){
+                    orderDataService.updateStatus(order.getOrderNo(), "0");
+                } catch (Exception e) {
                     //发生异常，记录日志信息
-                    String errMsg = String.format("推送批销订单异常，订单号：%s，异常信息: %s", order.getOrderNo(), e.getMessage()) ;
+                    String errMsg = String.format("推送批销订单异常，订单号：%s，异常信息: %s", order.getOrderNo(), e.getMessage());
                     log.error(errMsg);
                 }
             }
@@ -89,7 +90,7 @@ public class PxOrderServiceImpl implements IPxOrderService {
                     entity.setOrderNo(order.getOrderNo());
                     entity.setShopNo(order.getShopNo());
                     BaseResponse<ResQueryOrderVo> response = httpBaseCallService.queryOrder(entity);
-                    if ("0".equals(response.getCode())){
+                    if ("0".equals(response.getCode())) {
                         OrderDo orderDo = orderDataService.getOrderByOrderNo(order.getOrderNo());
                         if (orderDo == null
                                 || !"0".equals(orderDo.getDeliveryStatus())) {
@@ -97,33 +98,42 @@ public class PxOrderServiceImpl implements IPxOrderService {
                         }
 
                         orderDo.setDeliveryStatus(response.getData().getDeliveryStatus());
-                        orderDo.setDeliveryDate(Convert.stringToDate(response.getData().getDeliveryDate(),"yyyy-MM-dd"));
+                        orderDo.setDeliveryDate(Convert.stringToDate(response.getData().getDeliveryDate(), "yyyy-MM-dd"));
                         orderDataService.updateById(orderDo);
 
                         List<OrderItemsDo> orderItems = orderDataService.listOrderItemsByOrderNo(order.getOrderNo());
-                        if (!CollectionUtils.isEmpty(orderItems)){
-                            for (OrderItemsDo orderItem : orderItems){
+                        if (!CollectionUtils.isEmpty(orderItems)) {
+                            for (OrderItemsDo orderItem : orderItems) {
                                 OrderItemVo orderItemVo = response.getData().getOrderItem().stream()
                                         .filter(item -> item.getGoodsCode().equals(orderItem.getGoodsCode()))
                                         .findFirst()
                                         .orElse(null);
-                                if (orderItemVo == null){
+                                if (orderItemVo == null) {
                                     continue;
                                 }
-                                orderItem.setDeliveryDate(orderItemVo.getDeliveryDate());
-                                orderItem.setDeliveryNo(orderItemVo.getDeliveryNo());
-                                orderItem.setDeliveryNum(Convert.ToString(orderItemVo.getDeliveryNum().setScale(2)));
+                                if (!orderItem.getDeliveryDate().equals(orderItemVo.getDeliveryStatus())) {
+                                    if (!StringUtils.isEmpty(orderItemVo.getDeliveryStatus())) {
+                                        orderItem.setDeliveryStatus(orderItemVo.getDeliveryStatus());
+                                    }
+                                    if (orderItemVo.getDeliveryDate() != null) {
+                                        orderItem.setDeliveryDate(orderItemVo.getDeliveryDate());
+                                    }
+
+                                    if (!StringUtils.isEmpty(orderItemVo.getDeliveryNo())) {
+                                        orderItem.setDeliveryNo(orderItemVo.getDeliveryNo());
+                                    }
+                                    orderItem.setDeliveryNum(Convert.ToString(orderItemVo.getDeliveryNum().setScale(2)));
+                                }
                                 orderItem.setPrice(orderItemVo.getPrice().setScale(2));
-                                orderItem.setDeliveryStatus(orderItemVo.getDeliveryStatus());
                             }
 
                             orderDataService
                                     .updateOrderItems(orderItems);
                         }
                     }
-                }catch (Exception e){
+                } catch (Exception e) {
                     //发生异常，记录日志信息
-                    String errMsg = String.format("同步更新订单状态信息异常，订单号：%s，异常信息: %s", order.getOrderNo(), e.getMessage()) ;
+                    String errMsg = String.format("同步更新订单状态信息异常，订单号：%s，异常信息: %s", order.getOrderNo(), e.getMessage());
                     log.error(errMsg);
                 }
             }
@@ -131,24 +141,24 @@ public class PxOrderServiceImpl implements IPxOrderService {
     }
 
     /**
+     * @return void
      * @Description //TODO 推送验收订单
      * @Date 11:45 2024/7/21
      * @Param []
-     * @return void
      **/
     @Override
     public void sendReceipt() {
         List<ReqReceiveVo> orderList = orderDataService.listReqReceiveByDeliveryStatus("-2");
-        if (!CollectionUtils.isEmpty(orderList)){
+        if (!CollectionUtils.isEmpty(orderList)) {
             //待推送订单处理
-            for (ReqReceiveVo order : orderList){
+            for (ReqReceiveVo order : orderList) {
                 try {
                     httpBaseCallService.receive(order);
                     //没有异常的，更新订单状态
-                    orderDataService.updateStatus(order.getOrderNo(),"0");
-                }catch (Exception e){
+                    orderDataService.updateStatus(order.getOrderNo(), "0");
+                } catch (Exception e) {
                     //发生异常，记录日志信息
-                    String errMsg = String.format("推送批销订单异常，订单号：%s，异常信息: %s", order.getOrderNo(), e.getMessage()) ;
+                    String errMsg = String.format("推送批销订单异常，订单号：%s，异常信息: %s", order.getOrderNo(), e.getMessage());
                     log.error(errMsg);
                 }
             }

@@ -138,6 +138,7 @@ public class HttpBaseCallServiceImpl implements IHttpBaseCallService {
     public BaseResponse receive(ReqReceiveVo entity) {
         ShopDo shopDo = shopDataService.getById(entity.getShopNo());
         Assert.notNull(shopDo,"门店[" + entity.getShopNo() + "]不存在!");
+        entity.setShopNo(null);
         BaseResponse result = call("receive", entity, shopDo.getTaxno().trim());
         return result;
     }
