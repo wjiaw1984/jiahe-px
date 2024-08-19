@@ -652,7 +652,7 @@ AS BEGIN
 	  ------------------增加批销处理-----------------------
 	  if @pxvenderid <> -1 and @pxvenderid = @VenderId begin
 	    insert into px_order (sheetid,sheettype,orderNo,shopNo,orderType,orderDate,deliveryDate,orderTitle,deliveryStatus)
-		select rtrim(@WMSSheetID),2301,rtrim(@WMSSheetID),rtrim(a.shopid),'Z001',@PurDate,@PurDate + 1,rtrim(notes),-1
+		select rtrim(@WMSSheetID),2301,rtrim(@WMSSheetID),rtrim(a.shopid),'Z001',checkdate,checkdate + 1,rtrim(notes),-1
 		from Receipt0 a
 		where a.sheetid = @SheetID;
 

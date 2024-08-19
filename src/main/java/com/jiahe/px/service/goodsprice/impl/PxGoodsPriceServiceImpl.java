@@ -45,6 +45,7 @@ public class PxGoodsPriceServiceImpl implements IPxGoodsPriceService {
             ReqPxGoodsPriceVo params = new ReqPxGoodsPriceVo();
             params.setCurPageNo(pageNo);
             resPxGoodsPriceList = listPxGoodsPrice(params);
+            log.info("商品价格查询页["+pageNo+"]，接口返回总页数："+resPxGoodsPriceList.getTotalPage());
             if (!CollectionUtils.isEmpty(resPxGoodsPriceList.getGoods())){
                 try {
                     pxGoodsPriceDataService.batchSaveOrUpdate(resPxGoodsPriceList.getGoods());
@@ -56,7 +57,6 @@ public class PxGoodsPriceServiceImpl implements IPxGoodsPriceService {
                     if (!CollectionUtils.isEmpty(resPxGoodsPriceList.getGoods())) {
                         resPxGoodsPriceList.getGoods().clear();
                     }
-                    resPxGoodsPriceList = null;
                 }
             }
         }while  (resPxGoodsPriceList.getTotalPage()>pageNo);
