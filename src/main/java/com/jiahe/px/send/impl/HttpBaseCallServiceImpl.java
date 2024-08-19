@@ -113,7 +113,7 @@ public class HttpBaseCallServiceImpl implements IHttpBaseCallService {
     @Override
     public BaseResponse orderSave(ReqOrderSaveVo entity) {
         ShopDo shopDo = shopDataService.getById(entity.getShopNo());
-        Assert.isNull(shopDo,"门店[" + entity.getShopNo() + "]不存在!");
+        Assert.notNull(shopDo,"门店[" + entity.getShopNo() + "]不存在!");
         BaseResponse result = call("orderSave", entity, shopDo.getTaxno().trim());
         return result;
     }
@@ -123,7 +123,7 @@ public class HttpBaseCallServiceImpl implements IHttpBaseCallService {
         String customNo = null;
         if (!StringUtils.isEmpty(entity.getShopNo())) {
             ShopDo shopDo = shopDataService.getById(entity.getShopNo());
-            Assert.isNull(shopDo,"门店[" + entity.getShopNo() + "]不存在!");
+            Assert.notNull(shopDo,"门店[" + entity.getShopNo() + "]不存在!");
             customNo = shopDo.getTaxno().trim();
             entity.setShopNo(null);
         }
@@ -137,7 +137,7 @@ public class HttpBaseCallServiceImpl implements IHttpBaseCallService {
     @Override
     public BaseResponse receive(ReqReceiveVo entity) {
         ShopDo shopDo = shopDataService.getById(entity.getShopNo());
-        Assert.isNull(shopDo,"门店[" + entity.getShopNo() + "]不存在!");
+        Assert.notNull(shopDo,"门店[" + entity.getShopNo() + "]不存在!");
         BaseResponse result = call("receive", entity, shopDo.getTaxno().trim());
         return result;
     }
