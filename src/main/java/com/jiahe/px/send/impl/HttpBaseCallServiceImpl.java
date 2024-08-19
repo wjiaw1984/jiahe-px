@@ -125,6 +125,7 @@ public class HttpBaseCallServiceImpl implements IHttpBaseCallService {
             ShopDo shopDo = shopDataService.getById(entity.getShopNo());
             Assert.isNull(shopDo,"门店[" + entity.getShopNo() + "]不存在!");
             customNo = shopDo.getTaxno().trim();
+            entity.setShopNo(null);
         }
 
         BaseResponse<ResQueryOrderVo> result = call("queryOrder", entity, customNo);
