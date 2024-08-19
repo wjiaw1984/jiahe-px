@@ -122,9 +122,16 @@ public class PxOrderServiceImpl implements IPxOrderService {
                                     if (!StringUtils.isEmpty(orderItemVo.getDeliveryNo())) {
                                         orderItem.setDeliveryNo(orderItemVo.getDeliveryNo());
                                     }
-                                    orderItem.setDeliveryNum(Convert.ToString(orderItemVo.getDeliveryNum().setScale(2)));
+
+                                    if (orderItemVo.getDeliveryNum() != null) {
+                                        orderItem.setDeliveryNum(Convert.ToString(orderItemVo.getDeliveryNum().setScale(2)));
+                                    }
+
+                                    if (!StringUtils.isEmpty(orderItemVo.getPrice())) {
+                                        orderItem.setPrice(orderItemVo.getPrice().setScale(2));
+                                    }
                                 }
-                                orderItem.setPrice(orderItemVo.getPrice().setScale(2));
+
                             }
 
                             orderDataService
