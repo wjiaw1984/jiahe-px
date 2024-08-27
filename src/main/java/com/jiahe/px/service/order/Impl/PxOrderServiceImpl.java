@@ -79,7 +79,7 @@ public class PxOrderServiceImpl implements IPxOrderService {
     @Override
     public void syncOrder() {
         //获取待同步的订单
-        List<String> statues = Arrays.asList("0");
+        List<String> statues = Arrays.asList("0","1");
         List<ReqOrderSaveVo> orderList = orderDataService.listReqOrderSaveByDeliveryStatus(statues);
         if (!CollectionUtils.isEmpty(orderList)) {
             //待同步订单处理
@@ -111,7 +111,8 @@ public class PxOrderServiceImpl implements IPxOrderService {
                                 if (orderItemVo == null) {
                                     continue;
                                 }
-                                if (!orderItem.getDeliveryDate().equals(orderItemVo.getDeliveryStatus())) {
+                                if (!StringUtils.isEmpty(orderItemVo.getDeliveryStatus())
+                                        && !orderItem.getDeliveryStatus().equals(orderItemVo.getDeliveryStatus())) {
                                     if (!StringUtils.isEmpty(orderItemVo.getDeliveryStatus())) {
                                         orderItem.setDeliveryStatus(orderItemVo.getDeliveryStatus());
                                     }
@@ -140,8 +141,9 @@ public class PxOrderServiceImpl implements IPxOrderService {
                     }
                 } catch (Exception e) {
                     //发生异常，记录日志信息
-                    String errMsg = String.format("同步更新订单状态信息异常，订单号：%s，异常信息: %s", order.getOrderNo(), e.getMessage());
-                    log.error(errMsg);
+                    log.error("同步更新订单信息异常，订单号：{}，异常信息: ", order.getOrderNo(), e);
+                    /*String errMsg = String.format("同步更新订单状态信息异常，订单号：%s，异常信息: %s", order.getOrderNo(), e);
+                    log.error(errMsg);*/
                 }
             }
         }

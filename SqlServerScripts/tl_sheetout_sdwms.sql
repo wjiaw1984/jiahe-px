@@ -657,7 +657,7 @@ AS BEGIN
 		where a.sheetid = @SheetID;
 
 		insert into px_Order_Items (orderNo,goodscode,BarCode,GoodsId,num)
-		select rtrim(@WMSSheetID), a.goodsid, a.barcode, a.goodsid, a.OrderQty
+		select rtrim(@WMSSheetID), a.goodsid, a.barcodeid, a.goodsid, a.OrderQty
 		from ReceiptItem0 a
 		where a.sheetid = @SheetID;
 	  end;

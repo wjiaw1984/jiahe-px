@@ -75,7 +75,7 @@ public class OrderDo implements Serializable {
         result.setOrderType(null);
         result.setContactPerson(null);
         result.setContactPhone(null);
-        result.setShopNo(null);
+        result.setShopNo(this.shopNo);
         result.setDeliveryDate(null);
         return result;
     }
